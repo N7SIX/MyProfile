@@ -95,6 +95,11 @@ This repository now includes a starter backend in [monitoring/cloudflare-worker.
 Automatic mode is available using [usage-tracker-config.js](usage-tracker-config.js), which is loaded by [index.html](index.html).
 Edit this file once and the website tracker uses those values automatically.
 
+Code organization:
+
+- [usage-monitoring.js](usage-monitoring.js) contains monitoring/counter logic for the main site
+- [script.js](script.js) contains site interaction/animation/social UI logic
+
 7. Track specific usage actions by adding attributes on elements:
 
 	```html

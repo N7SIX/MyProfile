@@ -388,6 +388,8 @@ h3 {
 }
 
 .usage-shell {
+  display: grid;
+  gap: 12px;
   padding: 28px;
   border: 1px solid var(--line);
   border-radius: 20px;
@@ -398,13 +400,64 @@ h3 {
   box-shadow: 0 24px 56px rgba(0, 0, 0, 0.28);
 }
 
+.usage-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
 .usage-shell h2 {
   font-size: clamp(1.8rem, 3vw, 2.8rem);
-  max-width: 18ch;
+  max-width: 16ch;
+}
+
+.usage-health-pill {
+  margin-top: 2px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 178, 213, 0.34);
+  background: rgba(12, 30, 52, 0.72);
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.usage-health-pill.is-live {
+  border-color: rgba(143, 240, 212, 0.45);
+  color: var(--accent-strong);
+}
+
+.usage-stat-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 12px;
+}
+
+.usage-stat-card {
+  border: 1px solid rgba(148, 178, 213, 0.2);
+  border-radius: 14px;
+  background: rgba(7, 20, 36, 0.55);
+  padding: 14px;
+}
+
+.usage-stat-label {
+  color: var(--muted);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.usage-meta-card {
+  display: grid;
+  align-content: center;
 }
 
 .usage-total {
-  margin-top: 14px;
+  margin-top: 10px;
   font-family: "Hyundai Sans Head", sans-serif;
   font-size: clamp(2.6rem, 7vw, 4.8rem);
   letter-spacing: 0.02em;
@@ -413,12 +466,12 @@ h3 {
 }
 
 .usage-caption {
-  margin-top: 10px;
+  margin-top: 6px;
   color: var(--muted);
 }
 
 .usage-last-updated {
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 0.84rem;
   color: rgba(151, 170, 195, 0.9);
 }
@@ -902,6 +955,15 @@ h3 {
   .usage-pill {
     width: 100%;
     text-align: center;
+  }
+
+  .usage-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .usage-stat-grid {
+    grid-template-columns: 1fr;
   }
 
   .hero {

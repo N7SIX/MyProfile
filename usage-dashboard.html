@@ -9,25 +9,35 @@
   <body>
     <main class="dashboard-shell">
       <header class="dashboard-header">
-        <h1>Usage Dashboard</h1>
-        <p>View usage totals, countries, IPs, and action counters.</p>
+        <div>
+          <h1>Usage Dashboard</h1>
+          <p>View usage totals, countries, IPs, and action counters.</p>
+        </div>
+        <div class="dashboard-meta" aria-live="polite">
+          <span id="dashboard-mode" class="meta-pill">Mode: Manual</span>
+          <span id="dashboard-sync" class="meta-pill">Last sync: --</span>
+        </div>
       </header>
 
       <section class="controls" aria-label="Dashboard filters">
-        <label>
+        <label for="worker-url">
           Worker URL
           <input id="worker-url" type="url" placeholder="https://your-worker.workers.dev" />
         </label>
-        <label>
+        <label for="site-id">
           Site ID
           <input id="site-id" type="text" placeholder="uvtools-multi-firmware-web-flasher" />
         </label>
-        <label id="admin-token-group">
+        <label id="admin-token-group" for="admin-token">
           Admin Token
           <input id="admin-token" type="password" placeholder="ADMIN_TOKEN" />
         </label>
         <button id="load-stats" type="button">Load Stats</button>
       </section>
+
+      <p class="controls-help">
+        Tip: set defaults in usage-monitor-config.js to auto-load and auto-refresh monitoring data.
+      </p>
 
       <section class="kpi-grid" aria-label="Summary metrics">
         <article class="kpi-card">
@@ -42,44 +52,50 @@
 
       <section class="table-section">
         <h2>By Event</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Event</th>
-              <th>Count</th>
-            </tr>
-          </thead>
-          <tbody id="event-rows"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody id="event-rows"></tbody>
+          </table>
+        </div>
       </section>
 
       <section class="table-section">
         <h2>By Country</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Country</th>
-              <th>Count</th>
-            </tr>
-          </thead>
-          <tbody id="country-rows"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Country</th>
+                <th>Count</th>
+              </tr>
+            </thead>
+            <tbody id="country-rows"></tbody>
+          </table>
+        </div>
       </section>
 
       <section class="table-section">
         <h2>Recent Events</h2>
-        <table>
-          <thead>
-            <tr>
-              <th>Timestamp</th>
-              <th>Event</th>
-              <th>Country</th>
-              <th>IP</th>
-              <th>Path</th>
-            </tr>
-          </thead>
-          <tbody id="recent-rows"></tbody>
-        </table>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Event</th>
+                <th>Country</th>
+                <th>IP</th>
+                <th>Path</th>
+              </tr>
+            </thead>
+            <tbody id="recent-rows"></tbody>
+          </table>
+        </div>
       </section>
 
       <p id="status" class="status" aria-live="polite"></p>

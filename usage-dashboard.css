@@ -28,6 +28,13 @@ body {
   margin: 24px auto 40px;
 }
 
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+}
+
 .dashboard-header h1 {
   margin: 0;
   font-size: 2rem;
@@ -36,6 +43,29 @@ body {
 .dashboard-header p {
   margin: 6px 0 0;
   color: var(--muted);
+}
+
+.dashboard-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(148, 178, 213, 0.28);
+  border-radius: 999px;
+  background: rgba(17, 37, 64, 0.78);
+  padding: 7px 10px;
+  color: var(--muted);
+  font-size: 0.79rem;
+  letter-spacing: 0.02em;
+}
+
+.meta-pill.is-secure {
+  border-color: rgba(57, 196, 154, 0.45);
+  color: #9cf0d0;
 }
 
 .controls {
@@ -48,6 +78,12 @@ body {
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   align-items: end;
+}
+
+.controls-help {
+  margin: 10px 2px 0;
+  color: var(--muted);
+  font-size: 0.84rem;
 }
 
 .controls label {
@@ -75,6 +111,11 @@ body {
   font-weight: 700;
   padding: 10px;
   cursor: pointer;
+}
+
+.controls button:disabled {
+  opacity: 0.72;
+  cursor: progress;
 }
 
 .kpi-grid {
@@ -119,9 +160,14 @@ body {
   border-bottom: 1px solid var(--line);
 }
 
+.table-wrap {
+  overflow-x: auto;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 520px;
 }
 
 th,
@@ -151,6 +197,11 @@ th {
 }
 
 @media (max-width: 960px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .controls {
     grid-template-columns: 1fr;
   }
@@ -160,7 +211,6 @@ th {
   }
 
   table {
-    display: block;
-    overflow-x: auto;
+    min-width: 640px;
   }
 }

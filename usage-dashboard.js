@@ -3,6 +3,8 @@ const siteIdInput = document.getElementById('site-id');
 const adminTokenInput = document.getElementById('admin-token');
 const adminTokenGroup = document.getElementById('admin-token-group');
 const loadStatsButton = document.getElementById('load-stats');
+const dashboardModeNode = document.getElementById('dashboard-mode');
+const dashboardSyncNode = document.getElementById('dashboard-sync');
 const kpiTotal = document.getElementById('kpi-total');
 const kpiIps = document.getElementById('kpi-ips');
 const eventRows = document.getElementById('event-rows');
@@ -25,6 +27,7 @@ const externalMonitorConfig =
     : {};
 
 let autoRefreshTimer = 0;
+let isLoading = false;
 
 const setStatus = (message, isError = false) => {
   statusNode.textContent = message;
@@ -45,15 +48,38 @@ const createRow = (values) => {
   return row;
 };
 
-const renderTable = (target, rows) => {
+const createEmptyRow = (message, columnCount) => {
+  const row = document.createElement('tr');
+  const cell = document.createElement('td');
+  cell.colSpan = Math.max(columnCount, 1);
+  cell.textContent = message;
+  row.appendChild(cell);
+  return row;
+};
+
+const renderTable = (target, rows, columnCount = 2) => {
   target.innerHTML = '';
 
   if (!rows.length) {
-    target.appendChild(createRow(['No data', '']));
+    target.appendChild(createEmptyRow('No data', columnCount));
     return;
   }
 
   rows.forEach((row) => target.appendChild(row));
+};
+
+const updateButtonLoadingState = (loading) => {
+  isLoading = loading;
+  loadStatsButton.disabled = loading;
+  loadStatsButton.textContent = loading ? 'Loading...' : 'Load Stats';
+};
+
+const updateLastSync = () => {
+  if (!dashboardSyncNode) {
+    return;
+  }
+
+  dashboardSyncNode.textContent = `Last sync: ${new Date().toLocaleString()}`;
 };
 
 const loadSavedConfig = () => {
@@ -124,6 +150,10 @@ const saveConfig = (workerUrl, siteId, adminToken) => {
 };
 
 const fetchStats = async () => {
+  if (isLoading) {
+    return;
+  }
+
   const workerUrl = workerUrlInput.value.trim().replace(/\/$/, '');
   const siteId = siteIdInput.value.trim();
   const adminToken = adminTokenInput.value.trim();
@@ -136,6 +166,7 @@ const fetchStats = async () => {
   saveConfig(workerUrl, siteId, adminToken);
 
   setStatus('Loading stats...');
+  updateButtonLoadingState(true);
 
   const endpoint = `${workerUrl}/stats?site=${encodeURIComponent(siteId)}&token=${encodeURIComponent(adminToken)}`;
 
@@ -159,30 +190,36 @@ const fetchStats = async () => {
 
     renderTable(
       eventRows,
-      (data.events || []).map((row) => createRow([row.event, formatNumber(row.count)]))
+      (data.events || []).map((row) => createRow([row.event, formatNumber(row.count)])),
+      2
     );
 
     renderTable(
       countryRows,
-      (data.countries || []).map((row) => createRow([row.country, formatNumber(row.count)]))
+      (data.countries || []).map((row) => createRow([row.country, formatNumber(row.count)])),
+      2
     );
 
     renderTable(
       recentRows,
       (data.recent || []).map((row) =>
         createRow([
-          row.created_at || '',
+          row.created_at ? new Date(row.created_at).toLocaleString() : '',
           row.event || '',
           row.country || '',
           row.ip_address || '',
           row.path || '',
         ])
-      )
+      ),
+      5
     );
 
+    updateLastSync();
     setStatus('Stats loaded successfully.');
   } catch (error) {
     setStatus(`Failed to load stats: ${error.message}`, true);
+  } finally {
+    updateButtonLoadingState(false);
   }
 };
 
@@ -203,6 +240,33 @@ const applyAutoVisibility = (config) => {
     !Boolean(config.showTokenField);
 
   adminTokenGroup.classList.toggle('is-hidden', shouldHide);
+};
+
+const applyModeMeta = (config) => {
+  if (!dashboardModeNode) {
+    return;
+  }
+
+  const secureAutoMode =
+    Boolean(config.autoLoad) &&
+    Boolean((config.adminToken || '').trim()) &&
+    Boolean(config.hideAdminTokenField) &&
+    !Boolean(config.showTokenField);
+
+  if (secureAutoMode) {
+    dashboardModeNode.textContent = 'Mode: Secure Auto';
+    dashboardModeNode.classList.add('is-secure');
+    return;
+  }
+
+  if (Boolean(config.autoLoad)) {
+    dashboardModeNode.textContent = 'Mode: Auto';
+    dashboardModeNode.classList.remove('is-secure');
+    return;
+  }
+
+  dashboardModeNode.textContent = 'Mode: Manual';
+  dashboardModeNode.classList.remove('is-secure');
 };
 
 const maybeAutoLoad = (config) => {
@@ -235,6 +299,7 @@ const setupAutoRefresh = (config) => {
 const resolvedConfig = resolveConfig();
 applyConfigToInputs(resolvedConfig);
 applyAutoVisibility(resolvedConfig);
+applyModeMeta(resolvedConfig);
 saveConfig(
   (resolvedConfig.workerUrl || '').trim().replace(/\/$/, ''),
   (resolvedConfig.siteId || '').trim(),
