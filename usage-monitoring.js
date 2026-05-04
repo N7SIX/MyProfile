@@ -32,6 +32,10 @@ const USAGE_TRACKER = {
 
 let lastCountValue = 0;
 
+const countryNameResolver = typeof Intl !== 'undefined' && typeof Intl.DisplayNames === 'function'
+  ? new Intl.DisplayNames(['en'], { type: 'region' })
+  : null;
+
 const trackUsageEvent = async (eventName, extra = {}) => {
   if (!USAGE_TRACKER.eventEndpoint || USAGE_TRACKER.eventEndpoint.includes('your-worker-subdomain')) {
     return;
@@ -217,13 +221,14 @@ const renderCountrySummary = (countries) => {
 
   usageCountriesListNode.innerHTML = countries
     .map((item) => {
-      const code = String(item.country || 'UNKNOWN');
+      const code = String(item.country || 'UNKNOWN').toUpperCase();
+      const countryLabel = formatCountryLabel(code);
       const count = Number(item.count || 0);
       const width = Math.round((count / maxCount) * 100);
 
       return `
         <div class="country-row">
-          <span class="country-code">${escapeHtml(code)}</span>
+          <span class="country-code">${escapeHtml(countryLabel)}</span>
           <div class="country-bar-track">
             <div class="country-bar-fill" style="width: ${width}%"></div>
           </div>
@@ -245,6 +250,29 @@ const renderCountryPlaceholder = (message = 'No country data yet') => {
 
   if (usageCountriesTotalNode) {
     usageCountriesTotalNode.textContent = 'Total countries: --';
+  }
+};
+
+const formatCountryLabel = (countryCode) => {
+  const code = String(countryCode || '').toUpperCase();
+
+  if (!code || code === 'UNKNOWN' || code === 'XX') {
+    return 'Unknown';
+  }
+
+  if (!/^[A-Z]{2}$/.test(code)) {
+    return code;
+  }
+
+  if (!countryNameResolver) {
+    return code;
+  }
+
+  try {
+    const name = countryNameResolver.of(code);
+    return name ? `${name} - ${code}` : code;
+  } catch {
+    return code;
   }
 };
 
