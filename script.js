@@ -4,6 +4,37 @@ const backgroundCanvas = document.getElementById('background-canvas');
 const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 const socialFeed = document.getElementById('social-feed');
 const socialSummary = document.getElementById('social-summary');
+const hamClockNodes = {
+  utcTime: document.getElementById('hc-utc-time'),
+  localTime: document.getElementById('hc-local-time'),
+  localZone: document.getElementById('hc-local-zone'),
+  dayInfo: document.getElementById('hc-day-info'),
+  grid: document.getElementById('hc-grid'),
+  moon: document.getElementById('hc-moon-phase'),
+  sunrise: document.getElementById('hc-sunrise'),
+  sunset: document.getElementById('hc-sunset'),
+  solarWindow: document.getElementById('hc-solar-window'),
+  bandNow: document.getElementById('hc-band-now'),
+  bandNext: document.getElementById('hc-band-next'),
+  targetSelect: document.getElementById('hc-target-select'),
+  dxTarget: document.getElementById('hc-dx-target'),
+  dxBearing: document.getElementById('hc-dx-bearing'),
+  dxDistance: document.getElementById('hc-dx-distance'),
+};
+
+const STATION_PROFILE = {
+  callsign: 'N7SIX',
+  lat: 14.5995,
+  lon: 120.9842,
+  localTimeZone: 'Asia/Manila',
+};
+
+const DX_TARGETS = {
+  tokyo: { label: 'Tokyo, JP', lat: 35.6762, lon: 139.6503 },
+  singapore: { label: 'Singapore, SG', lat: 1.3521, lon: 103.8198 },
+  london: { label: 'London, UK', lat: 51.5072, lon: -0.1276 },
+  california: { label: 'California, US', lat: 36.7783, lon: -119.4179 },
+};
 
 document.documentElement.classList.add('reveal-ready');
 
@@ -59,6 +90,12 @@ if (socialFeed && socialSummary) {
   });
 
   socialSummary.textContent = `This feed is generated from ${socialProfiles.length} configured channels.`;
+}
+
+const hasHamClockPanel = Object.values(hamClockNodes).some((node) => Boolean(node));
+
+if (hasHamClockPanel) {
+  initializeHamClockPanel();
 }
 
 if (backgroundCanvas && !reduceMotionQuery.matches) {
@@ -247,4 +284,299 @@ interactiveCards.forEach((card) => {
 
 if (typeof window.__setRuntimeFlag === 'function') {
   window.__setRuntimeFlag('siteUiReady');
+}
+
+function initializeHamClockPanel() {
+  if (hamClockNodes.localZone) {
+    hamClockNodes.localZone.textContent = STATION_PROFILE.localTimeZone;
+  }
+
+  if (hamClockNodes.grid) {
+    hamClockNodes.grid.textContent = toMaidenhead(STATION_PROFILE.lat, STATION_PROFILE.lon, 6);
+  }
+
+  const updateClockData = () => {
+    const now = new Date();
+    const utcHour = now.getUTCHours();
+
+    if (hamClockNodes.utcTime) {
+      hamClockNodes.utcTime.textContent = formatTime(now, 'UTC');
+    }
+
+    if (hamClockNodes.localTime) {
+      hamClockNodes.localTime.textContent = formatTime(now, STATION_PROFILE.localTimeZone);
+    }
+
+    if (hamClockNodes.dayInfo) {
+      const dayOfYear = getDayOfYear(now);
+      const week = getIsoWeek(now);
+      hamClockNodes.dayInfo.textContent = `DOY ${String(dayOfYear).padStart(3, '0')} | Week ${week}`;
+    }
+
+    if (hamClockNodes.moon) {
+      hamClockNodes.moon.textContent = getMoonPhaseLabel(now);
+    }
+
+    const bandPlan = getBandPlan(utcHour);
+
+    if (hamClockNodes.bandNow) {
+      hamClockNodes.bandNow.textContent = `Now: ${bandPlan.now}`;
+    }
+
+    if (hamClockNodes.bandNext) {
+      hamClockNodes.bandNext.textContent = `Next: ${bandPlan.next}`;
+    }
+  };
+
+  updateClockData();
+  window.setInterval(updateClockData, 1000);
+
+  updateDxHeading();
+
+  if (hamClockNodes.targetSelect) {
+    hamClockNodes.targetSelect.addEventListener('change', updateDxHeading);
+  }
+
+  loadSunTimes();
+}
+
+function formatTime(date, timeZone) {
+  return new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+    timeZone,
+  }).format(date);
+}
+
+function getDayOfYear(date) {
+  const start = Date.UTC(date.getUTCFullYear(), 0, 1);
+  const current = Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+  return Math.floor((current - start) / 86400000) + 1;
+}
+
+function getIsoWeek(date) {
+  const tmp = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const day = tmp.getUTCDay() || 7;
+  tmp.setUTCDate(tmp.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+  return Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
+}
+
+function getMoonPhaseLabel(date) {
+  const knownNewMoon = Date.UTC(2000, 0, 6, 18, 14, 0);
+  const synodicMonth = 29.530588853;
+  const daysSince = (date.getTime() - knownNewMoon) / 86400000;
+  const phase = ((daysSince % synodicMonth) + synodicMonth) % synodicMonth;
+  const normalized = phase / synodicMonth;
+
+  if (normalized < 0.03 || normalized >= 0.97) {
+    return 'New Moon';
+  }
+
+  if (normalized < 0.22) {
+    return 'Waxing Crescent';
+  }
+
+  if (normalized < 0.28) {
+    return 'First Quarter';
+  }
+
+  if (normalized < 0.47) {
+    return 'Waxing Gibbous';
+  }
+
+  if (normalized < 0.53) {
+    return 'Full Moon';
+  }
+
+  if (normalized < 0.72) {
+    return 'Waning Gibbous';
+  }
+
+  if (normalized < 0.78) {
+    return 'Last Quarter';
+  }
+
+  return 'Waning Crescent';
+}
+
+function getBandPlan(utcHour) {
+  if (utcHour < 4) {
+    return {
+      now: '40m / 80m regional night activity',
+      next: '20m around sunrise openings',
+    };
+  }
+
+  if (utcHour < 8) {
+    return {
+      now: '20m long-haul openings (Asia/Pacific)',
+      next: '17m and 15m as daylight rises',
+    };
+  }
+
+  if (utcHour < 12) {
+    return {
+      now: '17m / 15m daytime DX windows',
+      next: '20m broad international paths',
+    };
+  }
+
+  if (utcHour < 17) {
+    return {
+      now: '20m stable daytime propagation',
+      next: '30m and 40m near evening transition',
+    };
+  }
+
+  if (utcHour < 21) {
+    return {
+      now: '40m evening regional and medium DX',
+      next: '80m deeper night local nets',
+    };
+  }
+
+  return {
+    now: '30m / 40m transition period',
+    next: '20m sunrise openings shortly after',
+  };
+}
+
+async function loadSunTimes() {
+  const endpoint = `https://api.sunrise-sunset.org/json?lat=${encodeURIComponent(String(STATION_PROFILE.lat))}&lng=${encodeURIComponent(String(STATION_PROFILE.lon))}&formatted=0`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: { Accept: 'application/json' },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const data = await response.json();
+    const results = data && data.results ? data.results : null;
+
+    if (!results || !results.sunrise || !results.sunset) {
+      throw new Error('Missing sunrise/sunset data');
+    }
+
+    const sunrise = new Date(results.sunrise);
+    const sunset = new Date(results.sunset);
+    const sunriseLocal = formatTime(sunrise, STATION_PROFILE.localTimeZone);
+    const sunsetLocal = formatTime(sunset, STATION_PROFILE.localTimeZone);
+    const daylightHours = Math.max(0, (sunset.getTime() - sunrise.getTime()) / 3600000);
+
+    if (hamClockNodes.sunrise) {
+      hamClockNodes.sunrise.textContent = `Sunrise: ${sunriseLocal}`;
+    }
+
+    if (hamClockNodes.sunset) {
+      hamClockNodes.sunset.textContent = `Sunset: ${sunsetLocal}`;
+    }
+
+    if (hamClockNodes.solarWindow) {
+      hamClockNodes.solarWindow.textContent = `Daylight window: ${daylightHours.toFixed(1)} hours`;
+    }
+  } catch {
+    if (hamClockNodes.sunrise) {
+      hamClockNodes.sunrise.textContent = 'Sunrise: unavailable';
+    }
+
+    if (hamClockNodes.sunset) {
+      hamClockNodes.sunset.textContent = 'Sunset: unavailable';
+    }
+
+    if (hamClockNodes.solarWindow) {
+      hamClockNodes.solarWindow.textContent = 'Daylight window: unavailable';
+    }
+  }
+}
+
+function updateDxHeading() {
+  const selectedKey = hamClockNodes.targetSelect ? hamClockNodes.targetSelect.value : 'tokyo';
+  const target = DX_TARGETS[selectedKey] || DX_TARGETS.tokyo;
+  const bearing = calculateBearing(STATION_PROFILE.lat, STATION_PROFILE.lon, target.lat, target.lon);
+  const distanceKm = haversineDistanceKm(STATION_PROFILE.lat, STATION_PROFILE.lon, target.lat, target.lon);
+
+  if (hamClockNodes.dxTarget) {
+    hamClockNodes.dxTarget.textContent = `Target: ${target.label}`;
+  }
+
+  if (hamClockNodes.dxBearing) {
+    hamClockNodes.dxBearing.textContent = `Bearing: ${bearing.toFixed(0)}°`;
+  }
+
+  if (hamClockNodes.dxDistance) {
+    hamClockNodes.dxDistance.textContent = `Distance: ${distanceKm.toLocaleString(undefined, { maximumFractionDigits: 0 })} km`;
+  }
+}
+
+function calculateBearing(lat1, lon1, lat2, lon2) {
+  const phi1 = toRadians(lat1);
+  const phi2 = toRadians(lat2);
+  const lambda = toRadians(lon2 - lon1);
+  const y = Math.sin(lambda) * Math.cos(phi2);
+  const x = (Math.cos(phi1) * Math.sin(phi2)) - (Math.sin(phi1) * Math.cos(phi2) * Math.cos(lambda));
+  return (toDegrees(Math.atan2(y, x)) + 360) % 360;
+}
+
+function haversineDistanceKm(lat1, lon1, lat2, lon2) {
+  const earthRadiusKm = 6371;
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a = (Math.sin(dLat / 2) ** 2) + (Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) * (Math.sin(dLon / 2) ** 2));
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return earthRadiusKm * c;
+}
+
+function toRadians(value) {
+  return value * (Math.PI / 180);
+}
+
+function toDegrees(value) {
+  return value * (180 / Math.PI);
+}
+
+function toMaidenhead(lat, lon, precision) {
+  const levels = Math.max(2, Math.min(Number(precision) || 6, 8));
+  const normalizedLat = lat + 90;
+  const normalizedLon = lon + 180;
+  const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const lower = 'abcdefghijklmnopqrstuvwxyz';
+  let locator = '';
+
+  let lonValue = normalizedLon;
+  let latValue = normalizedLat;
+  let lonWidth = 20;
+  let latWidth = 10;
+
+  const lonField = Math.floor(lonValue / lonWidth);
+  const latField = Math.floor(latValue / latWidth);
+  locator += upper[lonField] + upper[latField];
+  lonValue -= lonField * lonWidth;
+  latValue -= latField * latWidth;
+
+  if (levels >= 4) {
+    lonWidth /= 10;
+    latWidth /= 10;
+    const lonSquare = Math.floor(lonValue / lonWidth);
+    const latSquare = Math.floor(latValue / latWidth);
+    locator += String(lonSquare) + String(latSquare);
+    lonValue -= lonSquare * lonWidth;
+    latValue -= latSquare * latWidth;
+  }
+
+  if (levels >= 6) {
+    lonWidth /= 24;
+    latWidth /= 24;
+    const lonSub = Math.floor(lonValue / lonWidth);
+    const latSub = Math.floor(latValue / latWidth);
+    locator += lower[lonSub] + lower[latSub];
+  }
+
+  return locator;
 }

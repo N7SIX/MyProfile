@@ -6,6 +6,8 @@ const usageTrendChartNode = document.getElementById('usage-trend-chart');
 const usageTrendPeakNode = document.getElementById('usage-trend-peak');
 const usageCountriesTotalNode = document.getElementById('usage-countries-total');
 const usageCountriesListNode = document.getElementById('usage-countries-list');
+const usageWorldMapNode = document.getElementById('usage-world-map');
+const usageWorldMapCaptionNode = document.getElementById('usage-world-map-caption');
 
 const DEFAULT_USAGE_TRACKER = {
   eventEndpoint: 'https://your-worker-subdomain.workers.dev/event',
@@ -35,6 +37,112 @@ let lastCountValue = 0;
 const countryNameResolver = typeof Intl !== 'undefined' && typeof Intl.DisplayNames === 'function'
   ? new Intl.DisplayNames(['en'], { type: 'region' })
   : null;
+
+const COUNTRY_NAME_FALLBACK = {
+  AU: 'Australia',
+  BR: 'Brazil',
+  CA: 'Canada',
+  CN: 'China',
+  DE: 'Germany',
+  ES: 'Spain',
+  FR: 'France',
+  GB: 'United Kingdom',
+  HK: 'Hong Kong',
+  ID: 'Indonesia',
+  IN: 'India',
+  IT: 'Italy',
+  JP: 'Japan',
+  KR: 'South Korea',
+  MY: 'Malaysia',
+  NL: 'Netherlands',
+  NZ: 'New Zealand',
+  PH: 'Philippines',
+  RU: 'Russia',
+  SA: 'Saudi Arabia',
+  SE: 'Sweden',
+  SG: 'Singapore',
+  TH: 'Thailand',
+  TR: 'Turkey',
+  TW: 'Taiwan',
+  US: 'United States',
+  VN: 'Vietnam',
+};
+
+const COUNTRY_CENTROIDS = {
+  AU: { lat: -25.27, lon: 133.77 },
+  BR: { lat: -14.24, lon: -51.93 },
+  CA: { lat: 56.13, lon: -106.35 },
+  CN: { lat: 35.86, lon: 104.2 },
+  DE: { lat: 51.17, lon: 10.45 },
+  ES: { lat: 40.46, lon: -3.75 },
+  FR: { lat: 46.23, lon: 2.21 },
+  GB: { lat: 55.38, lon: -3.44 },
+  HK: { lat: 22.32, lon: 114.17 },
+  ID: { lat: -0.79, lon: 113.92 },
+  IN: { lat: 20.59, lon: 78.96 },
+  IT: { lat: 41.87, lon: 12.57 },
+  JP: { lat: 36.2, lon: 138.25 },
+  KR: { lat: 35.91, lon: 127.77 },
+  MY: { lat: 4.21, lon: 101.98 },
+  NL: { lat: 52.13, lon: 5.29 },
+  NZ: { lat: -40.9, lon: 174.89 },
+  PH: { lat: 12.88, lon: 121.77 },
+  RU: { lat: 61.52, lon: 105.32 },
+  SA: { lat: 23.89, lon: 45.08 },
+  SE: { lat: 60.13, lon: 18.64 },
+  SG: { lat: 1.35, lon: 103.82 },
+  TH: { lat: 15.87, lon: 100.99 },
+  TR: { lat: 38.96, lon: 35.24 },
+  TW: { lat: 23.7, lon: 121.0 },
+  US: { lat: 37.09, lon: -95.71 },
+  VN: { lat: 14.06, lon: 108.28 },
+};
+
+const WORLD_LANDMASSES = [
+  // North America
+  [
+    [-168, 72], [-145, 72], [-128, 66], [-110, 58], [-96, 50], [-82, 44],
+    [-78, 34], [-88, 24], [-102, 18], [-112, 25], [-120, 32], [-132, 42],
+    [-145, 52], [-160, 60],
+  ],
+  // South America
+  [
+    [-81, 12], [-72, 8], [-66, -4], [-64, -18], [-60, -30], [-54, -42],
+    [-48, -53], [-39, -48], [-35, -34], [-36, -20], [-45, -8], [-58, 2],
+    [-70, 9],
+  ],
+  // Europe + Asia (Eurasia)
+  [
+    [-10, 36], [0, 44], [16, 52], [30, 58], [46, 64], [66, 66], [86, 61],
+    [104, 56], [120, 48], [132, 42], [142, 51], [156, 62], [172, 58],
+    [166, 44], [152, 34], [132, 24], [110, 20], [92, 14], [74, 12],
+    [56, 18], [44, 26], [32, 36], [20, 42], [8, 44], [-2, 40],
+  ],
+  // Africa
+  [
+    [-16, 35], [-4, 37], [12, 35], [24, 28], [33, 16], [40, 4], [42, -12],
+    [36, -28], [24, -34], [12, -35], [2, -24], [-6, -6], [-12, 10],
+  ],
+  // Arabian Peninsula
+  [
+    [34, 32], [44, 30], [52, 24], [54, 16], [50, 12], [44, 13], [40, 18],
+    [36, 25],
+  ],
+  // Southeast Asia islands
+  [
+    [96, 18], [106, 18], [116, 12], [124, 6], [128, -2], [122, -8],
+    [112, -6], [102, 0], [96, 8],
+  ],
+  // Australia
+  [
+    [112, -12], [122, -18], [134, -20], [146, -24], [152, -34], [146, -42],
+    [132, -43], [120, -38], [112, -28],
+  ],
+  // Greenland
+  [
+    [-58, 82], [-42, 80], [-30, 74], [-34, 64], [-46, 60], [-56, 66],
+  ],
+];
 
 const trackUsageEvent = async (eventName, extra = {}) => {
   if (!USAGE_TRACKER.eventEndpoint || USAGE_TRACKER.eventEndpoint.includes('your-worker-subdomain')) {
@@ -241,6 +349,8 @@ const renderCountrySummary = (countries) => {
   if (usageCountriesTotalNode) {
     usageCountriesTotalNode.textContent = `Total countries: ${countries.length}`;
   }
+
+  renderWorldMap(countries);
 };
 
 const renderCountryPlaceholder = (message = 'No country data yet') => {
@@ -251,6 +361,111 @@ const renderCountryPlaceholder = (message = 'No country data yet') => {
   if (usageCountriesTotalNode) {
     usageCountriesTotalNode.textContent = 'Total countries: --';
   }
+
+  renderWorldMap([], 'No map data yet');
+};
+
+const renderWorldMap = (countries, message) => {
+  if (!usageWorldMapNode) {
+    return;
+  }
+
+  const width = 860;
+  const height = 360;
+  const pad = 18;
+  const maxCount = Math.max(...countries.map((item) => Number(item.count || 0)), 1);
+  const markerEntries = countries
+    .map((item) => {
+      const code = String(item.country || '').toUpperCase();
+      const centroid = COUNTRY_CENTROIDS[code];
+
+      if (!centroid) {
+        return null;
+      }
+
+      const projected = projectWorldPoint(centroid.lon, centroid.lat, width, height, pad);
+      const count = Number(item.count || 0);
+      const radius = 4 + ((count / maxCount) * 7);
+
+      return {
+        code,
+        label: formatCountryLabel(code),
+        count,
+        x: projected.x,
+        y: projected.y,
+        radius,
+      };
+    })
+    .filter(Boolean);
+
+  const markerSvg = markerEntries
+    .map((entry) => `
+      <circle cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${entry.radius.toFixed(2)}" fill="rgba(143,240,212,0.86)" stroke="rgba(6,22,42,0.95)" stroke-width="1.3"></circle>
+      <text x="${(entry.x + 8).toFixed(2)}" y="${(entry.y - 8).toFixed(2)}" fill="rgba(236,244,255,0.9)" font-size="10" font-family="'Hyundai Sans Head', sans-serif">${escapeHtml(entry.code)}</text>
+    `)
+    .join('');
+
+  usageWorldMapNode.innerHTML = `
+    <defs>
+      <linearGradient id="mapBg" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0%" stop-color="rgba(14,36,63,0.95)"></stop>
+        <stop offset="100%" stop-color="rgba(8,22,40,0.98)"></stop>
+      </linearGradient>
+      <radialGradient id="mapGlow" cx="50%" cy="50%" r="70%">
+        <stop offset="0%" stop-color="rgba(64,210,164,0.20)"></stop>
+        <stop offset="100%" stop-color="rgba(64,210,164,0.02)"></stop>
+      </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="${width}" height="${height}" fill="url(#mapBg)"></rect>
+    <rect x="0" y="0" width="${width}" height="${height}" fill="url(#mapGlow)"></rect>
+    ${buildLandmassPaths(width, height, pad)}
+    ${buildMapGrid(width, height, pad)}
+    ${markerSvg}
+    ${message ? `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="rgba(151,170,195,0.95)" font-size="14">${escapeHtml(message)}</text>` : ''}
+  `;
+
+  if (usageWorldMapCaptionNode) {
+    usageWorldMapCaptionNode.textContent = markerEntries.length
+      ? `Plotted countries: ${markerEntries.length}`
+      : 'Plotted countries: --';
+  }
+};
+
+const buildMapGrid = (width, height, pad) => {
+  const lines = [];
+
+  for (let lon = -150; lon <= 150; lon += 30) {
+    const start = projectWorldPoint(lon, -75, width, height, pad);
+    const end = projectWorldPoint(lon, 75, width, height, pad);
+    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.12)" stroke-width="1"></line>`);
+  }
+
+  for (let lat = -60; lat <= 60; lat += 30) {
+    const start = projectWorldPoint(-180, lat, width, height, pad);
+    const end = projectWorldPoint(180, lat, width, height, pad);
+    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.12)" stroke-width="1"></line>`);
+  }
+
+  return lines.join('');
+};
+
+const buildLandmassPaths = (width, height, pad) => WORLD_LANDMASSES
+  .map((polygon) => {
+    const path = polygon
+      .map(([lon, lat], index) => {
+        const point = projectWorldPoint(lon, lat, width, height, pad);
+        return `${index === 0 ? 'M' : 'L'}${point.x.toFixed(2)},${point.y.toFixed(2)}`;
+      })
+      .join(' ');
+
+    return `<path d="${path} Z" fill="rgba(53, 92, 124, 0.45)" stroke="rgba(143, 240, 212, 0.22)" stroke-width="1.1"></path>`;
+  })
+  .join('');
+
+const projectWorldPoint = (lon, lat, width, height, pad) => {
+  const x = ((lon + 180) / 360) * (width - (pad * 2)) + pad;
+  const y = ((90 - lat) / 180) * (height - (pad * 2)) + pad;
+  return { x, y };
 };
 
 const formatCountryLabel = (countryCode) => {
@@ -265,14 +480,21 @@ const formatCountryLabel = (countryCode) => {
   }
 
   if (!countryNameResolver) {
-    return code;
+    const fallbackName = COUNTRY_NAME_FALLBACK[code];
+    return fallbackName ? `${fallbackName} - ${code}` : code;
   }
 
   try {
     const name = countryNameResolver.of(code);
-    return name ? `${name} - ${code}` : code;
+    if (name) {
+      return `${name} - ${code}`;
+    }
+
+    const fallbackName = COUNTRY_NAME_FALLBACK[code];
+    return fallbackName ? `${fallbackName} - ${code}` : code;
   } catch {
-    return code;
+    const fallbackName = COUNTRY_NAME_FALLBACK[code];
+    return fallbackName ? `${fallbackName} - ${code}` : code;
   }
 };
 

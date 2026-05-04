@@ -388,6 +388,100 @@ h3 {
   box-shadow: 0 24px 56px rgba(0, 0, 0, 0.28);
 }
 
+.hamclock-shell {
+  display: grid;
+  gap: 14px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 14% 24%, rgba(143, 240, 212, 0.2), transparent 32%),
+    radial-gradient(circle at 86% 18%, rgba(84, 143, 255, 0.2), transparent 30%),
+    linear-gradient(180deg, rgba(7, 24, 48, 0.93), rgba(7, 19, 35, 0.95));
+  box-shadow: 0 24px 56px rgba(0, 0, 0, 0.28);
+}
+
+.hamclock-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.hamclock-head h2 {
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+}
+
+.hamclock-note {
+  max-width: 42ch;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.hamclock-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hamclock-card {
+  border: 1px solid rgba(148, 178, 213, 0.2);
+  border-radius: 14px;
+  background: rgba(7, 20, 36, 0.56);
+  padding: 14px;
+  min-height: 120px;
+}
+
+.hamclock-card-wide {
+  grid-column: span 2;
+}
+
+.hamclock-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: "Hyundai Sans Head", sans-serif;
+}
+
+.hamclock-value {
+  margin-top: 8px;
+  font-family: "Hyundai Sans Head", sans-serif;
+  font-size: clamp(1.5rem, 3.2vw, 2.4rem);
+  color: var(--accent-strong);
+  line-height: 1.12;
+}
+
+.hamclock-sub {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 0.87rem;
+  line-height: 1.55;
+}
+
+.hamclock-sun-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.hamclock-dx-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.hamclock-select {
+  background: rgba(11, 30, 52, 0.85);
+  border: 1px solid rgba(148, 178, 213, 0.26);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 0.82rem;
+}
+
 .usage-head {
   display: flex;
   justify-content: space-between;
@@ -468,10 +562,24 @@ h3 {
   margin-top: 16px;
   padding: 14px;
   border-radius: 14px;
+
+  .hamclock-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hamclock-note {
+    text-align: left;
+    max-width: none;
+  }
   border: 1px solid rgba(148, 178, 213, 0.2);
   background: rgba(7, 20, 36, 0.55);
 }
 
+
+  .hamclock-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 .usage-trend-head {
   display: flex;
   align-items: center;
@@ -521,9 +629,40 @@ h3 {
   gap: 8px;
 }
 
+.usage-world-map-panel {
+  margin-top: 12px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 178, 213, 0.2);
+  background: rgba(7, 20, 36, 0.55);
+}
+
+.usage-world-map-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.usage-world-map-head strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+#usage-world-map {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 178, 213, 0.18);
+}
+
 .country-row {
   display: grid;
-  grid-template-columns: 68px 1fr auto;
+  grid-template-columns: minmax(120px, 1.25fr) 1fr auto;
   align-items: center;
   gap: 10px;
 }
@@ -1033,6 +1172,22 @@ html[data-js-state="error"] .runtime-status {
 
   .usage-shell {
     padding: 20px;
+  }
+
+  .hamclock-shell {
+    padding: 20px;
+  }
+
+  .hamclock-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hamclock-card-wide {
+    grid-column: auto;
+  }
+
+  .hamclock-sun-grid {
+    grid-template-columns: 1fr;
   }
 
   .section {

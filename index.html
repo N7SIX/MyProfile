@@ -59,6 +59,7 @@
         </a>
 
         <nav class="nav" aria-label="Primary navigation">
+          <a href="#hamclock">HamClock</a>
           <a href="#profile">Profile</a>
           <a href="#radio">Radio</a>
           <a href="#social">Social</a>
@@ -148,6 +149,82 @@
                 <span id="usage-countries-total">Total countries: --</span>
               </div>
               <div id="usage-countries-list" class="usage-countries-list"></div>
+            </div>
+
+            <div class="usage-world-map-panel" aria-label="Worldwide visitor map">
+              <div class="usage-world-map-head">
+                <strong>World Visitor Map</strong>
+                <span id="usage-world-map-caption">Plotted countries: --</span>
+              </div>
+              <svg id="usage-world-map" viewBox="0 0 860 360" role="img" aria-label="World map with visitor country markers"></svg>
+            </div>
+          </div>
+        </section>
+
+        <section id="hamclock" class="section hamclock-section reveal" aria-label="Personalized ham clock dashboard">
+          <div class="hamclock-shell interactive-card">
+            <div class="hamclock-head">
+              <div>
+                <p class="section-label">Operator Console</p>
+                <h2>N7SIX HamClock</h2>
+              </div>
+              <p class="hamclock-note">Live operating references tuned for Sean in the Philippines.</p>
+            </div>
+
+            <div class="hamclock-grid">
+              <article class="hamclock-card">
+                <p class="hamclock-label">UTC Time</p>
+                <p id="hc-utc-time" class="hamclock-value">--:--:--</p>
+                <p id="hc-day-info" class="hamclock-sub">DOY -- | Week --</p>
+              </article>
+
+              <article class="hamclock-card">
+                <p class="hamclock-label">Local Time</p>
+                <p id="hc-local-time" class="hamclock-value">--:--:--</p>
+                <p id="hc-local-zone" class="hamclock-sub">Asia/Manila</p>
+              </article>
+
+              <article class="hamclock-card">
+                <p class="hamclock-label">Station Locator</p>
+                <p id="hc-grid" class="hamclock-value">--</p>
+                <p class="hamclock-sub">QTH: Metro Manila</p>
+              </article>
+
+              <article class="hamclock-card">
+                <p class="hamclock-label">Moon Phase</p>
+                <p id="hc-moon-phase" class="hamclock-value">--</p>
+                <p class="hamclock-sub">For night-sky operating context</p>
+              </article>
+
+              <article class="hamclock-card hamclock-card-wide">
+                <p class="hamclock-label">Solar Window</p>
+                <div class="hamclock-sun-grid">
+                  <p id="hc-sunrise" class="hamclock-sub">Sunrise: --</p>
+                  <p id="hc-sunset" class="hamclock-sub">Sunset: --</p>
+                </div>
+                <p id="hc-solar-window" class="hamclock-sub">Daylight window: --</p>
+              </article>
+
+              <article class="hamclock-card hamclock-card-wide">
+                <p class="hamclock-label">Band Focus</p>
+                <p id="hc-band-now" class="hamclock-sub">Now: --</p>
+                <p id="hc-band-next" class="hamclock-sub">Next: --</p>
+              </article>
+
+              <article class="hamclock-card hamclock-card-wide">
+                <div class="hamclock-dx-head">
+                  <p class="hamclock-label">DX Heading</p>
+                  <select id="hc-target-select" class="hamclock-select" aria-label="DX target selector">
+                    <option value="tokyo">Tokyo</option>
+                    <option value="singapore">Singapore</option>
+                    <option value="london">London</option>
+                    <option value="california">California</option>
+                  </select>
+                </div>
+                <p id="hc-dx-target" class="hamclock-sub">Target: --</p>
+                <p id="hc-dx-bearing" class="hamclock-sub">Bearing: --</p>
+                <p id="hc-dx-distance" class="hamclock-sub">Distance: --</p>
+              </article>
             </div>
           </div>
         </section>
