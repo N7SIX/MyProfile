@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>N7SIX — Amateur Radio &amp; Firmware Developer</title>
+  <meta name="description" content="N7SIX — Licensed Amateur Radio Operator and UV-K series firmware developer/contributor." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ╔══════════════════════════════╗ -->
+  <!-- ║          NAVIGATION          ║ -->
+  <!-- ╚══════════════════════════════╝ -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <a class="nav-logo" href="#">N7SIX</a>
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#radio">Ham Radio</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ╔══════════════════════════════╗ -->
+  <!-- ║             HERO             ║ -->
+  <!-- ╚══════════════════════════════╝ -->
+  <header id="hero">
+    <canvas id="wave-canvas"></canvas>
+    <div class="hero-content">
+      <div class="callsign-badge">
+        <span class="license-class">Amateur Extra</span>
+        <h1 class="callsign">N7SIX</h1>
+        <span class="region">Region 7 · USA</span>
+      </div>
+      <p class="hero-subtitle">
+        Licensed Amateur Radio Operator &amp;<br>
+        UV-K Series Firmware Developer
+      </p>
+      <div class="hero-cta">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="#contact" class="btn btn-outline">Get in Touch</a>
+      </div>
+      <div class="status-bar">
+        <span class="status-dot active"></span>
+        <span id="status-text">QRV · On the Air</span>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span></span>
+    </div>
+  </header>
+
+  <!-- ╔══════════════════════════════╗ -->
+  <!-- ║            ABOUT             ║ -->
+  <!-- ╚══════════════════════════════╝ -->
+  <section id="about" class="section">
+    <div class="container">
+      <h2 class="section-title">About Me</h2>
+      <div class="about-grid">
+        <div class="about-avatar">
+          <div class="avatar-ring">
+            <svg viewBox="0 0 200 200" class="avatar-svg" aria-hidden="true">
+              <circle cx="100" cy="100" r="90" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="6 4"/>
+              <text x="100" y="115" text-anchor="middle" font-size="64" font-family="monospace" fill="var(--accent)">N7SIX</text>
+            </svg>
+          </div>
+        </div>
+        <div class="about-text">
+          <p>
+            Hello and 73! I'm <strong>N7SIX</strong>, a licensed Amateur Radio operator and open-source
+            firmware hacker. My passion sits at the intersection of radio frequency (RF) experimentation
+            and embedded software development — tearing apart cheap handheld transceivers to push them
+            way beyond their factory limits.
+          </p>
+          <p>
+            I've been active in the amateur radio community, operating on HF, VHF, and UHF bands,
+            and contributing to the growing ecosystem of open-source firmware for the popular
+            <strong>Quansheng UV-K5 / UV-K6 / UV-5R Plus</strong> radio family.
+          </p>
+          <p>
+            When I'm not on the air, I'm reverse-engineering firmware, writing C code for
+            Cortex-M microcontrollers, and collaborating with the global SDR and ham radio
+            open-source community.
+          </p>
+          <div class="about-stats">
+            <div class="stat">
+              <span class="stat-value" data-target="73">0</span>
+              <span class="stat-label">73s Sent</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-target="12">0</span>
+              <span class="stat-label">Bands Active</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-target="4">0</span>
+              <span class="stat-label">UV-K Forks</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value" data-target="500">0</span>
+              <span class="stat-label">Commits</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ╔══════════════════════════════╗ -->
+  <!-- ║          HAM RADIO           ║ -->
+  <!-- ╚══════════════════════════════╝ -->
+  <section id="radio" class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Ham Radio</h2>
+      <div class="radio-grid">
+
+        <div class="radio-card">
+          <div class="card-icon">🎙️</div>
+          <h3>Callsign &amp; License</h3>
+          <ul class="info-list">
+            <li><span>Callsign</span><strong>N7SIX</strong></li>
+            <li><span>Class</span><strong>Amateur Extra</strong></li>
+            <li><span>Region</span><strong>7 (Pacific NW)</strong></li>
+            <li><span>Grid</span><strong>CN87</strong></li>
+          </ul>
+        </div>
+
+        <div class="radio-card">
+          <div class="card-icon">📡</div>
+          <h3>Operating Modes</h3>
+          <div class="mode-badges">
+            <span class="badge">SSB</span>
+            <span class="badge">CW</span>
+            <span class="badge">FM</span>
+            <span class="badge">FT8</span>
+            <span class="badge">APRS</span>
+            <span class="badge">DMR</span>
+            <span class="badge">D-STAR</span>
+            <span class="badge">WSPR</span>
+          </div>
+        </div>
+
+        <div class="radio-card">
+          <div class="card-icon">🌐</div>
+          <h3>Bands &amp; Rigs</h3>
+          <ul class="info-list">
+            <li><span>HF</span><strong>80m – 10m</strong></li>
+            <li><span>VHF</span><strong>2m (144 MHz)</strong></li>
+            <li><span>UHF</span><strong>70cm (430 MHz)</strong></li>
+            <li><span>Portable</span><strong>UV-K5 / BF-F8HP</strong></li>
+          </ul>
+        </div>
+
+        <div class="radio-card">
+          <div class="card-icon">🏆</div>
+          <h3>Activities &amp; Awards</h3>
+          <ul class="info-list">
+            <li><span>ARRL</span><strong>Member</strong></li>
+            <li><span>SOTA</span><strong>Activator</strong></li>
+            <li><span>POTA</span><strong>Parks on the Air</strong></li>
+            <li><span>EmComm</span><strong>ARES / RACES</strong></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="spectrum-bar" id="spectrum-bar" aria-hidden="true">
+        <canvas id="spectrum-canvas"></canvas>
+        <div class="spectrum-label">
+          <span>144.000 MHz</span>
+          <span>LIVE SPECTRUM (SIMULATED)</span>
+          <span>148.000 MHz</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ╔══════════════════════════════╗ -->
+  <!-- ║           PROJECTS           ║ -->
+  <!-- ╚══════════════════════════════╝ -->
+  <section id="projects" class="section">
+    <div class="container">
+      <h2 class="section-title">Projects &amp; Contributions</h2>
+      <p class="section-sub">Open-source UV-K series firmware hacking &amp; amateur radio tooling</p>
+
+      <div class="projects-grid">
+
+        <article class="project-card featured">
+          <div class="project-header">
+            <span class="project-tag">Firmware</span>
+            <span class="project-tag featured-tag">Featured</span>
+          </div>
+          <h3>UV-K5 Custom Firmware</h3>
+          <p>
+            Active contributor to open-source custom firmware for the Quansheng UV-K5/K6 radios.
+            Adds extended frequency coverage, NOAA weather channels, signal-strength RSSI bar,
+            spectrum analyzer, and advanced menu options — all on a $20 radio.
+          </p>
+          <div class="tech-stack">
+            <span>C</span><span>ARM Cortex-M</span><span>Keil</span><span>GCC</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/egzumer/uv-k5-firmware" target="_blank" rel="noopener" class="btn btn-sm">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+              Source
+            </a>
+            <a href="https://github.com/whosmatt/uvmod" target="_blank" rel="noopener" class="btn btn-sm btn-outline">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+              Modder
+            </a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-header">
+            <span class="project-tag">Tool</span>
+          </div>
+          <h3>UV-K5 Firmware Flasher</h3>
+          <p>
+            Python-based command-line tool for reading/writing UV-K5 EEPROM and
+            flashing custom firmware over the radio's serial programming port
+            without proprietary software.
+          </p>
+          <div class="tech-stack">
+            <span>Python</span><span>Serial</span><span>EEPROM</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/OpenRTX/chirp" target="_blank" rel="noopener" class="btn btn-sm btn-outline">GitHub</a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-header">
+            <span class="project-tag">Plugin</span>
+          </div>
+          <h3>CHIRP Radio Manager Plug-in</h3>
+          <p>
+            Contributed a UV-K5 driver plug-in to CHIRP — the popular open-source
+            radio memory management tool — enabling graphical channel editing
+            and frequency programming for the UV-K series.
+          </p>
+          <div class="tech-stack">
+            <span>Python</span><span>CHIRP API</span><span>USB HID</span>
+          </div>
+          <div class="project-links">
+            <a href="https://chirp.danplanet.com" target="_blank" rel="noopener" class="btn btn-sm btn-outline">CHIRP</a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-header">
+            <span class="project-tag">SDR</span>
+          </div>
+          <h3>SDR Spectrum Tools</h3>
+          <p>
+            Scripts and utilities for visualizing RF spectrum data captured via
+            RTL-SDR dongles, including waterfall displays, band monitoring,
+            and automated anomaly detection.
+          </p>
+          <div class="tech-stack">
+            <span>Python</span><span>NumPy</span><span>RTL-SDR</span><span>GNURadio</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/N7SIX" target="_blank" rel="noopener" class="btn btn-sm btn-outline">GitHub</a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-header">
+            <span class="project-tag">APRS</span>
+          </div>
+          <h3>APRS Gateway Node</h3>
+          <p>
+            Raspberry Pi–based APRS iGate and digipeater using Direwolf,
+            bridging local VHF APRS traffic to the APRS-IS network and
+            providing real-time position tracking for SOTA/POTA activations.
+          </p>
+          <div class="tech-stack">
+            <span>Linux</span><span>Direwolf</span><span>APRS-IS</span><span>Python</span>
+          </div>
+          <div class="project-links">
+            <a href="https://aprs.fi" target="_blank" rel="noopener" class="btn btn-sm btn-outline">aprs.fi</a>
+          </div>
+        </article>
+
+        <article class="project-card">
+          <div class="project-header">
+            <span class="project-tag">Web</span>
+          </div>
+          <h3>This Profile Site</h3>
+          <p>
+            Open-source GitHub Pages profile built with vanilla HTML, CSS, and
+            JavaScript — featuring a live spectrum visualizer, animated RF wave
+            canvas, and full dark-mode design.
+          </p>
+          <div class="tech-stack">
+            <span>HTML</span><span>CSS</span><span>JavaScript</span><span>Canvas API</span>
+          </div>
+          <div class="project-links">
+            <a href="https://github.com/N7SIX/N7SIX_MyProfile.github.io" target="_blank" rel="noopener" class="btn btn-sm btn-outline">GitHub</a>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ╔══════════════════════════════╗ -->
+  <!-- ║            SKILLS            ║ -->
+  <!-- ╚══════════════════════════════╝ -->
+  <section id="skills" class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Skills &amp; Stack</h2>
+      <div class="skills-grid">
+
+        <div class="skill-group">
+          <h3>📻 RF &amp; Radio</h3>
+          <ul>
+            <li>HF/VHF/UHF Operations</li>
+            <li>SDR (Software Defined Radio)</li>
+            <li>Antenna Design &amp; VSWR</li>
+            <li>Digital Modes (FT8, APRS, DMR)</li>
+            <li>RF Propagation Analysis</li>
+          </ul>
+        </div>
+
+        <div class="skill-group">
+          <h3>⚙️ Embedded Dev</h3>
+          <ul>
+            <li>C / C++ (bare-metal)</li>
+            <li>ARM Cortex-M (DP32G030)</li>
+            <li>EEPROM / SPI / I²C / UART</li>
+            <li>Keil MDK &amp; GCC Toolchain</li>
+            <li>Firmware Reverse Engineering</li>
+          </ul>
+        </div>
+
+        <div class="skill-group">
+          <h3>💻 Software</h3>
+          <ul>
+            <li>Python (scripting, serial, RF)</li>
+            <li>Git / GitHub / CI</li>
+            <li>Linux / Bash scripting</li>
+            <li>GNURadio &amp; RTL-SDR</li>
+            <li>HTML / CSS / JavaScript</li>
+          </ul>
+        </div>
+
+        <div class="skill-group">
+          <h3>🔧 Tools</h3>
+          <ul>
+            <li>CHIRP Radio Manager</li>
+            <li>RTL-SDR / SDR#</li>
+            <li>Wireshark / Protocol Analysis</li>
+            <li>Raspberry Pi / Arduino</li>
+            <li>3D Printing (antenna mounts)</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ╔══════════════════════════════╗ -->
+  <!-- ║           CONTACT            ║ -->
+  <!-- ╚══════════════════════════════╝ -->
+  <section id="contact" class="section">
+    <div class="container">
+      <h2 class="section-title">Contact &amp; Links</h2>
+      <p class="section-sub">Best heard on 2m simplex or via GitHub Issues · 73 de N7SIX</p>
+
+      <div class="contact-grid">
+
+        <a href="https://github.com/N7SIX" target="_blank" rel="noopener" class="contact-card">
+          <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.34-3.369-1.34-.454-1.154-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836a9.59 9.59 0 012.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
+          <span>GitHub</span>
+          <small>@N7SIX</small>
+        </a>
+
+        <a href="https://www.qrz.com/db/N7SIX" target="_blank" rel="noopener" class="contact-card">
+          <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm-1 15v-4H7l5-8v4h4l-5 8z"/>
+          </svg>
+          <span>QRZ.com</span>
+          <small>N7SIX</small>
+        </a>
+
+        <a href="https://aprs.fi/N7SIX" target="_blank" rel="noopener" class="contact-card">
+          <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+          </svg>
+          <span>APRS.fi</span>
+          <small>Track N7SIX</small>
+        </a>
+
+        <a href="mailto:n7six@arrl.net" class="contact-card">
+          <svg class="contact-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+          </svg>
+          <span>Email</span>
+          <small>n7six@arrl.net</small>
+        </a>
+
+      </div>
+
+      <div class="qso-callout">
+        <span class="morse" aria-label="CQ CQ DE N7SIX K">-.-. --.- / -.-. --.- / -.. . / -. --... ... .. -..- / -.-</span>
+        <p>CQ CQ DE N7SIX K</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ╔══════════════════════════════╗ -->
+  <!-- ║            FOOTER            ║ -->
+  <!-- ╚══════════════════════════════╝ -->
+  <footer>
+    <div class="container footer-inner">
+      <span>© 2024–2025 N7SIX · All content CC BY-SA 4.0</span>
+      <span class="footer-73">73 &amp; 88 de N7SIX</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
