@@ -8,31 +8,31 @@ const socialSummary = document.getElementById('social-summary');
 const socialProfiles = [
   {
     platform: 'Email',
-    title: 'Contact Me Directly',
+    title: 'Email',
     href: 'mailto:n7six@amateurwire.org',
     displayUrl: 'n7six@amateurwire.org',
-    note: 'This is my direct line for collaboration, project requests, and technical inquiries.',
+    note: 'A simple way to reach me for general inquiries and collaboration.',
   },
   {
     platform: 'QRZ',
-    title: 'My On-Air Identity',
+    title: 'QRZ Profile',
     href: 'https://www.qrz.com/db/N7SIX',
     displayUrl: 'qrz.com/db/N7SIX',
-    note: 'My QRZ profile contains my callsign details and amateur radio presence.',
+    note: 'My QRZ profile includes callsign details and radio-related information.',
   },
   {
     platform: 'Facebook',
-    title: 'My Community Updates',
+    title: 'Facebook',
     href: 'https://web.facebook.com/N7SIX',
     displayUrl: 'web.facebook.com/N7SIX',
-    note: 'I use this channel to share public updates, network activity, and ongoing posts.',
+    note: 'I occasionally share public updates and related posts here.',
   },
   {
     platform: 'YouTube',
-    title: 'My Video Channel',
+    title: 'YouTube',
     href: 'https://www.youtube.com/@N7SIX',
     displayUrl: 'youtube.com/@N7SIX',
-    note: 'I publish radio and development-focused video content here.',
+    note: 'I share radio and development-related video content here from time to time.',
   },
 ];
 
@@ -49,7 +49,7 @@ if (socialFeed && socialSummary) {
     socialFeed.appendChild(card);
   });
 
-  socialSummary.textContent = `I auto-generate this feed from ${socialProfiles.length} configured channels.`;
+  socialSummary.textContent = `This feed is generated from ${socialProfiles.length} configured channels.`;
 }
 
 if (backgroundCanvas && !reduceMotionQuery.matches) {
