@@ -69,18 +69,17 @@ body {
 }
 
 .identity-logo {
-  left: -14%;
-  bottom: -22%;
-  width: min(62vw, 900px);
+  left: 3%;
+  bottom: 5%;
+  width: min(30vw, 420px);
   aspect-ratio: 1 / 1;
-  border-radius: 50%;
   background-image: url("MyLogo/450875247_460375390191488_7588395686666713118_n.jpg");
-  opacity: 0.18;
+  background-size: contain;
+  background-position: center;
+  opacity: 0.2;
   filter: grayscale(0.2) saturate(0.9) contrast(1.08);
-  transform: rotate(-8deg);
+  transform: rotate(-5deg);
   mix-blend-mode: screen;
-  -webkit-mask-image: radial-gradient(circle at 54% 50%, black 48%, transparent 82%);
-  mask-image: radial-gradient(circle at 54% 50%, black 48%, transparent 82%);
 }
 
 .background-canvas {
@@ -657,10 +656,10 @@ h3 {
   }
 
   .identity-logo {
-    width: min(95vw, 640px);
-    left: -34%;
-    bottom: -14%;
-    opacity: 0.11;
+    width: min(52vw, 280px);
+    left: 4%;
+    bottom: 4%;
+    opacity: 0.16;
   }
 }
 
