@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>N7SIX — Amateur Radio Operator &amp; Developer</title>
+  <style>
+    /* ── Reset ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Design tokens ─────────────────────────────────────────────── */
+    :root {
+      --bg:          #0d1117;
+      --surface:     #161b22;
+      --surface-2:   #1c2330;
+      --border:      #30363d;
+      --green:       #39d353;
+      --green-dim:   #1a6e2b;
+      --orange:      #f0883e;
+      --blue:        #58a6ff;
+      --purple:      #bc8cff;
+      --text:        #e6edf3;
+      --muted:       #8b949e;
+      --radius:      8px;
+      --radius-lg:   14px;
+    }
+
+    /* ── Base ───────────────────────────────────────────────────────── */
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Layout ─────────────────────────────────────────────────────── */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Header / Hero ──────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(160deg, #0a1628 0%, #0d1117 60%);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 0 50px;
+    }
+    .hero { display: flex; align-items: center; gap: 36px; flex-wrap: wrap; }
+    .hero-avatar {
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      border: 3px solid var(--green);
+      box-shadow: 0 0 18px rgba(57,211,83,.35);
+      flex-shrink: 0;
+    }
+    .hero-text { flex: 1 1 260px; }
+    .callsign {
+      font-size: 2.8rem;
+      font-weight: 800;
+      letter-spacing: .06em;
+      color: var(--green);
+      text-shadow: 0 0 14px rgba(57,211,83,.5);
+      font-family: "Courier New", Courier, monospace;
+    }
+    .hero-tagline {
+      margin-top: 8px;
+      font-size: 1.05rem;
+      color: var(--muted);
+    }
+    .hero-tagline span { color: var(--orange); font-weight: 600; }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: .82rem;
+      font-weight: 600;
+      border: 1px solid;
+    }
+    .badge-ham  { border-color: var(--green); color: var(--green); }
+    .badge-dev  { border-color: var(--blue);  color: var(--blue);  }
+    .badge-fw   { border-color: var(--orange); color: var(--orange); }
+
+    /* ── Nav ────────────────────────────────────────────────────────── */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-inner {
+      display: flex; gap: 4px;
+      overflow-x: auto;
+      padding: 0 20px;
+    }
+    nav a {
+      display: block; padding: 14px 16px;
+      color: var(--muted);
+      font-size: .9rem;
+      white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    nav a:hover { color: var(--text); text-decoration: none; border-color: var(--border); }
+    nav a.active { color: var(--text); border-color: var(--green); }
+
+    /* ── Section shared ─────────────────────────────────────────────── */
+    section { padding: 60px 0; border-bottom: 1px solid var(--border); }
+    section:last-of-type { border-bottom: none; }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 28px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title .dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+    }
+
+    /* ── About ──────────────────────────────────────────────────────── */
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 620px) { .about-grid { grid-template-columns: 1fr; } }
+    .about-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+    .about-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; color: var(--orange); }
+    .about-card p, .about-card li { font-size: .9rem; color: var(--muted); line-height: 1.7; }
+    .about-card ul { padding-left: 18px; }
+
+    /* ── Skills ─────────────────────────────────────────────────────── */
+    .skills-wrap { display: flex; flex-wrap: wrap; gap: 10px; }
+    .skill-tag {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: .85rem;
+      color: var(--text);
+    }
+
+    /* ── Projects ───────────────────────────────────────────────────── */
+    .projects-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 620px) { .projects-grid { grid-template-columns: 1fr; } }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex; flex-direction: column; gap: 12px;
+      transition: border-color .2s, transform .2s;
+    }
+    .project-card:hover { border-color: var(--green); transform: translateY(-2px); }
+    .project-card h3 { font-size: 1rem; font-weight: 700; }
+    .project-card h3 a { color: var(--blue); }
+    .project-card p { font-size: .88rem; color: var(--muted); flex: 1; }
+    .lang-dot {
+      display: inline-block; width: 12px; height: 12px;
+      border-radius: 50%; margin-right: 6px;
+    }
+    .lang-c      { background: #555599; }
+    .lang-python { background: #3572A5; }
+    .meta-row { display: flex; align-items: center; gap: 16px; font-size: .82rem; color: var(--muted); }
+    .chip {
+      display: inline-block;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2px 10px;
+      font-size: .78rem;
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* ── Contributions ──────────────────────────────────────────────── */
+    .contrib-list { display: flex; flex-direction: column; gap: 16px; }
+    .contrib-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--orange);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+    }
+    .contrib-item h4 { font-size: .95rem; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    .contrib-item p  { font-size: .87rem; color: var(--muted); }
+
+    /* ── Contact ────────────────────────────────────────────────────── */
+    .contact-grid { display: flex; flex-wrap: wrap; gap: 14px; }
+    .contact-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: .9rem;
+      font-weight: 600;
+      transition: border-color .15s, background .15s;
+      text-decoration: none;
+    }
+    .contact-btn:hover { border-color: var(--green); background: var(--surface-2); text-decoration: none; }
+    .contact-btn svg { flex-shrink: 0; }
+
+    /* ── Footer ─────────────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 30px 20px;
+      color: var(--muted);
+      font-size: .82rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HEADER ═══════════════════════════════ -->
+<header>
+  <div class="container">
+    <div class="hero">
+      <img
+        class="hero-avatar"
+        src="https://avatars.githubusercontent.com/u/81456740?v=4"
+        alt="N7SIX avatar"
+      />
+      <div class="hero-text">
+        <div class="callsign">N7SIX</div>
+        <p class="hero-tagline">
+          <span>Licensed Amateur Radio Operator</span> ·
+          Developer · UV-K Series Firmware Contributor
+        </p>
+        <div class="badge-row">
+          <span class="badge badge-ham">📡 Amateur Radio</span>
+          <span class="badge badge-dev">💻 Developer</span>
+          <span class="badge badge-fw">🔧 Firmware</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════ NAV ══════════════════════════════════ -->
+<nav>
+  <div class="nav-inner container">
+    <a href="#about"         class="active">About</a>
+    <a href="#skills"                      >Skills</a>
+    <a href="#projects"                    >Projects</a>
+    <a href="#contributions"               >Contributions</a>
+    <a href="#contact"                     >Contact</a>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- ════════════════════════════ ABOUT ════════════════════════════════ -->
+  <section id="about">
+    <h2 class="section-title"><span class="dot"></span>About</h2>
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>📡 Amateur Radio Operator</h3>
+        <p>
+          Licensed under the callsign <strong style="color:var(--green);font-family:monospace;">N7SIX</strong>,
+          I am an active amateur radio operator passionate about VHF/UHF communication,
+          digital modes, and pushing the limits of budget handheld transceivers through
+          open-source firmware development.
+        </p>
+      </div>
+      <div class="about-card">
+        <h3>💻 Developer</h3>
+        <p>
+          Embedded C developer specializing in low-resource ARM Cortex-M microcontrollers
+          (DP32G030, PY32F071). I enjoy reverse-engineering radio hardware, writing
+          memory-efficient firmware, and building Python tooling to complement my radio
+          projects.
+        </p>
+      </div>
+      <div class="about-card">
+        <h3>🔧 UV-K Series Firmware</h3>
+        <p>
+          Author of the <strong>ApeX Edition</strong> custom firmware for the
+          Quansheng UV-K5 / K5(8) / K6 (v1) and the UV-K1 / UV-K5 v3 platforms.
+          Built upon the open-source ecosystem started by DualTachyon, OneOfEleven,
+          Egzumer, and F4HWN.
+        </p>
+      </div>
+      <div class="about-card">
+        <h3>🌐 Open-Source Philosophy</h3>
+        <ul>
+          <li>All firmware is released under the Apache 2.0 License</li>
+          <li>Follows the <em>ham spirit</em> — share, experiment, improve</li>
+          <li>Welcomes forks — strongly encourages keeping them open</li>
+          <li>Grateful for community support via donations &amp; feedback</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════ SKILLS ════════════════════════════════ -->
+  <section id="skills">
+    <h2 class="section-title"><span class="dot"></span>Skills &amp; Technologies</h2>
+    <div class="skills-wrap">
+      <span class="skill-tag">Embedded C</span>
+      <span class="skill-tag">ARM Cortex-M (DP32G030)</span>
+      <span class="skill-tag">ARM Cortex-M (PY32F071)</span>
+      <span class="skill-tag">Python</span>
+      <span class="skill-tag">CMake</span>
+      <span class="skill-tag">Docker</span>
+      <span class="skill-tag">GNU Arm Embedded Toolchain</span>
+      <span class="skill-tag">CHIRP Driver Development</span>
+      <span class="skill-tag">Spectrum Analyser / Waterfall</span>
+      <span class="skill-tag">RF &amp; VHF/UHF</span>
+      <span class="skill-tag">CTCSS / DCS</span>
+      <span class="skill-tag">Amateur Radio Protocols</span>
+      <span class="skill-tag">Git / GitHub</span>
+      <span class="skill-tag">Linux</span>
+      <span class="skill-tag">Shell scripting</span>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════ PROJECTS ══════════════════════════════ -->
+  <section id="projects">
+    <h2 class="section-title"><span class="dot"></span>Featured Projects</h2>
+    <div class="projects-grid">
+
+      <div class="project-card">
+        <h3>
+          <a href="https://github.com/N7SIX/UV-K5Series_ApeX-Edition_v7.6.0" target="_blank" rel="noopener">
+            UV-K5 Series — ApeX Edition
+          </a>
+        </h3>
+        <p>
+          Professional-grade custom firmware for the Quansheng UV-K5, K5(8) and K6 (v1)
+          handheld transceivers. Features Spectrum Analyzer + Waterfall, improved S-Meter
+          (IARU Region 1), enhanced scan lists, new menus, and many stability fixes.
+          Built on top of the Egzumer / OneOfEleven / F4HWN open-source lineage.
+        </p>
+        <div class="meta-row">
+          <span><span class="lang-dot lang-c"></span>C</span>
+          <span class="chip">ApeX Edition</span>
+          <span class="chip">DP32G030</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h3>
+          <a href="https://github.com/N7SIX/UV-K1Series_ApeX-Edition_v7.6.0" target="_blank" rel="noopener">
+            UV-K1 Series — ApeX Edition
+          </a>
+        </h3>
+        <p>
+          Port of the ApeX Edition to the newer <strong>UV-K1 and UV-K5 V3</strong>
+          platforms (PY32F071 MCU). All-in-one firmware including Spectrum Analyzer,
+          Waterfall, safety protections (low-voltage TX blocking, versioned A/B settings
+          snapshots with checksum validation), and CMake-based Docker build system.
+        </p>
+        <div class="meta-row">
+          <span><span class="lang-dot lang-c"></span>C</span>
+          <span class="chip">ApeX Edition</span>
+          <span class="chip">PY32F071</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h3>CHIRP Driver</h3>
+        <p>
+          Dedicated CHIRP programming driver for the ApeX Edition firmware, enabling
+          channel management through the popular CHIRP radio programming software.
+          Ships as a Python module compatible with CHIRP's plug-in architecture.
+        </p>
+        <div class="meta-row">
+          <span><span class="lang-dot lang-python"></span>Python</span>
+          <span class="chip">CHIRP</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h3>K5 Viewer</h3>
+        <p>
+          Python utility that renders the live screen of the Quansheng UV-K5 on a
+          computer via a USB-to-Serial cable. Useful for development, demonstration,
+          and remote-operation scenarios.
+        </p>
+        <div class="meta-row">
+          <span><span class="lang-dot lang-python"></span>Python</span>
+          <span class="chip">USB-Serial</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════ CONTRIBUTIONS ══════════════════════════ -->
+  <section id="contributions">
+    <h2 class="section-title"><span class="dot"></span>Key Contributions</h2>
+    <div class="contrib-list">
+
+      <div class="contrib-item">
+        <h4>📊 Spectrum Analyzer + Waterfall (Bandscope)</h4>
+        <p>
+          Extended the existing spectrum analyzer with a 4×4 Bayer 16-level grayscale
+          dithering waterfall display, channel name overlay, and persistent settings
+          storage on UV-K1 / UV-K5 V3 using the native flash path.
+        </p>
+      </div>
+
+      <div class="contrib-item">
+        <h4>📶 IARU-Compliant S-Meter</h4>
+        <p>
+          Rewrote the S-Meter logic to comply with IARU Region 1 Technical
+          Recommendation R.1 for VHF/UHF, replacing the Egzumer EEPROM-based level
+          settings with hardcoded values. Two styles available: Classic and Tiny.
+        </p>
+      </div>
+
+      <div class="contrib-item">
+        <h4>🛡️ Safety &amp; Persistence Hardening (UV-K1/K5 V3)</h4>
+        <p>
+          Implemented low-voltage TX blocking at 7.0V, deferred save handling during
+          unsafe battery conditions, versioned A/B settings snapshots with checksum
+          validation, generation-based boot recovery, and write-readback verification
+          retries — significantly reducing EEPROM/flash corruption risk.
+        </p>
+      </div>
+
+      <div class="contrib-item">
+        <h4>🔑 Expanded Menu &amp; UX Improvements</h4>
+        <p>
+          Added 15+ new menu entries (SetPwr, SetPTT, SetTOT, SetCtr, SetInv, SetEOT,
+          SetMet, SetLck, SetGUI, TXLock, SetTmr, SetOff, SetNFM, TxLock, etc.),
+          improved keyboard frequency input, new key shortcuts
+          (F+↑/↓ squelch, F+F1/F2 step), and a redesigned status bar.
+        </p>
+      </div>
+
+      <div class="contrib-item">
+        <h4>🌍 Regional Band Plans</h4>
+        <p>
+          Added frequency-lock band plans for <strong>HAM CA</strong> (Canadian zone),
+          <strong>PMR 446</strong>, and <strong>FRS/GMRS/MURS</strong> to make the
+          firmware compliant with regional amateur radio regulations out-of-the-box.
+        </p>
+      </div>
+
+      <div class="contrib-item">
+        <h4>🐍 CMake + Docker Build System (UV-K1/K5 V3)</h4>
+        <p>
+          Migrated the UV-K1/K5 V3 firmware build to a modern CMake + Docker workflow
+          with <code>CMakePresets.json</code>, making cross-platform reproducible builds
+          accessible without installing a local toolchain.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ════════════════════════════ CONTACT ═══════════════════════════════ -->
+  <section id="contact">
+    <h2 class="section-title"><span class="dot"></span>Contact &amp; Links</h2>
+    <div class="contact-grid">
+
+      <a class="contact-btn" href="https://github.com/N7SIX" target="_blank" rel="noopener">
+        <!-- GitHub icon -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839
+            9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605
+            -3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069
+            -.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088
+            2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951
+            0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27
+            2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909
+            -1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028
+            1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678
+            1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02
+            0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        GitHub
+      </a>
+
+      <a class="contact-btn" href="https://www.paypal.com/paypalme/N7SIX" target="_blank" rel="noopener">
+        <!-- PayPal icon -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19.554 9.488c.121.563.106 1.246-.04 2.051C18.948
+            14.977 17.097 16.5 14.2 16.5h-.467a.758.758 0 0 0-.748.641l-.04.218
+            -.595 3.777-.015.082a.758.758 0 0 1-.748.641H9.193a.455.455 0 0 1
+            -.449-.519l.85-5.395a.758.758 0 0 1 .748-.641h1.395c3.514 0 6.009-1.554
+            6.88-5.12a4.5 4.5 0 0 1 .937.304zM7.584 3.499h4.797c.966 0 1.871.08
+            2.696.249a5.97 5.97 0 0 1 .982.3c.484.197.92.46 1.296.797.457-2.918
+            -.003-4.9-1.58-6.698C14.075.606 11.46 0 8.186 0H2.033A.78.78 0 0 0
+            1.264.662L0 8.845l-.003.02a.78.78 0 0 0 .77.9h5.22l1.597-6.266z"/>
+        </svg>
+        Support via PayPal
+      </a>
+
+      <a class="contact-btn"
+         href="https://github.com/N7SIX/UV-K5Series_ApeX-Edition_v7.6.0"
+         target="_blank" rel="noopener">
+        <svg width="20" height="20" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             viewBox="0 0 24 24">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+        </svg>
+        UV-K5 ApeX Firmware
+      </a>
+
+      <a class="contact-btn"
+         href="https://github.com/N7SIX/UV-K1Series_ApeX-Edition_v7.6.0"
+         target="_blank" rel="noopener">
+        <svg width="20" height="20" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             viewBox="0 0 24 24">
+          <rect x="2" y="3" width="20" height="14" rx="2"/>
+          <path d="M8 21h8M12 17v4"/>
+        </svg>
+        UV-K1 ApeX Firmware
+      </a>
+
+    </div>
+  </section>
+
+</div><!-- .container -->
+
+<!-- ═══════════════════════════════ FOOTER ═══════════════════════════════ -->
+<footer>
+  <p>N7SIX &mdash; Licensed Amateur Radio Operator &amp; Developer</p>
+  <p style="margin-top:6px;">
+    All firmware released under the
+    <a href="https://www.apache.org/licenses/LICENSE-2.0" target="_blank" rel="noopener">Apache 2.0 License</a>
+  </p>
+</footer>
+
+</body>
+</html>
