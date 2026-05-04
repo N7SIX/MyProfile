@@ -242,3 +242,7 @@ interactiveCards.forEach((card) => {
     card.style.transform = '';
   });
 });
+
+if (typeof window.__setRuntimeFlag === 'function') {
+  window.__setRuntimeFlag('siteUiReady');
+}

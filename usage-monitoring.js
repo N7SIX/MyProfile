@@ -421,3 +421,7 @@ refreshUsagePanels();
 if (USAGE_TRACKER.countRefreshMs > 0) {
   window.setInterval(refreshUsagePanels, USAGE_TRACKER.countRefreshMs);
 }
+
+if (typeof window.__setRuntimeFlag === 'function') {
+  window.__setRuntimeFlag('monitoringReady');
+}
