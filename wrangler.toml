@@ -1,0 +1,13 @@
+name = "uvtools-usage-monitor"
+main = "monitoring/cloudflare-worker.js"
+compatibility_date = "2026-05-04"
+
+[env.production.vars]
+ALLOWED_ORIGINS = "https://n7six.github.io"
+WRITE_KEY = "f252fe34c5c59b700573157af5f7ffc3"
+ADMIN_TOKEN = "9581249f9af9640e43f73603f99437ef"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "uvtools-usage"
+database_id = "f4247f9f-817e-43cb-a6cf-57bb21f4c69e"

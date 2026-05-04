@@ -1,0 +1,19 @@
+
+ ⛅️ wrangler 4.87.0
+───────────────────
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mProcessing wrangler.toml configuration:[0m
+
+  
+    - "env.production" environment configuration
+      - Unexpected fields found in env.production.d1_databases[0] field: "ALLOWED_ORIGINS","WRITE_KEY","ADMIN_TOKEN"
+
+
+Total Upload: 8.40 KiB / gzip: 2.25 KiB
+Your Worker has access to the following bindings:
+Binding                     Resource         
+env.DB (uvtools-usage)      D1 Database      
+
+Uploaded uvtools-usage-monitor-production (4.41 sec)
+Deployed uvtools-usage-monitor-production triggers (2.33 sec)
+  https://uvtools-usage-monitor-production.n7six.workers.dev
+Current Version ID: afd4f74b-db53-4dd3-9774-9976145162c3
