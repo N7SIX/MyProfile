@@ -2,6 +2,55 @@ const revealNodes = document.querySelectorAll('.reveal');
 const interactiveCards = document.querySelectorAll('.interactive-card');
 const backgroundCanvas = document.getElementById('background-canvas');
 const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+const socialFeed = document.getElementById('social-feed');
+const socialSummary = document.getElementById('social-summary');
+
+const socialProfiles = [
+  {
+    platform: 'Email',
+    title: 'Direct Operator Contact',
+    href: 'mailto:n7six@amateurwire.org',
+    displayUrl: 'n7six@amateurwire.org',
+    note: 'Primary direct line for collaboration, project requests, and technical inquiries.',
+  },
+  {
+    platform: 'QRZ',
+    title: 'On-Air Identity',
+    href: 'https://www.qrz.com/db/N7SIX',
+    displayUrl: 'qrz.com/db/N7SIX',
+    note: 'Reference profile for callsign details and amateur radio presence.',
+  },
+  {
+    platform: 'Facebook',
+    title: 'Community Updates',
+    href: 'https://web.facebook.com/N7SIX',
+    displayUrl: 'web.facebook.com/N7SIX',
+    note: 'Social channel for public updates, network activity, and ongoing posts.',
+  },
+  {
+    platform: 'YouTube',
+    title: 'Video Channel',
+    href: 'https://www.youtube.com/@N7SIX',
+    displayUrl: 'youtube.com/@N7SIX',
+    note: 'Video stream for radio and development-focused content.',
+  },
+];
+
+if (socialFeed && socialSummary) {
+  socialProfiles.forEach((profile) => {
+    const card = document.createElement('article');
+    card.className = 'social-card';
+    card.innerHTML = `
+      <span class="platform-pill">${profile.platform}</span>
+      <h3>${profile.title}</h3>
+      <p>${profile.note}</p>
+      <a class="social-link" href="${profile.href}" ${profile.href.startsWith('http') ? 'target="_blank" rel="noopener noreferrer"' : ''}>${profile.displayUrl}</a>
+    `;
+    socialFeed.appendChild(card);
+  });
+
+  socialSummary.textContent = `Auto-generated from ${socialProfiles.length} configured channels for Sean (N7SIX).`;
+}
 
 if (backgroundCanvas && !reduceMotionQuery.matches) {
   const context = backgroundCanvas.getContext('2d');
