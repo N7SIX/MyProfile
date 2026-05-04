@@ -29,7 +29,11 @@ body {
   position: relative;
   isolation: isolate;
   font-family: "Sora", sans-serif;
+  font-weight: 400;
   color: var(--text);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   background:
     radial-gradient(circle at top left, rgba(64, 210, 164, 0.15), transparent 28%),
     radial-gradient(circle at 85% 15%, rgba(246, 168, 95, 0.16), transparent 24%),
@@ -112,14 +116,18 @@ a {
 
 p {
   margin: 0;
-  line-height: 1.7;
+  line-height: 1.72;
+  letter-spacing: 0.005em;
+  text-wrap: pretty;
 }
 
 h1,
 h2,
 h3 {
   margin: 0;
-  line-height: 1.1;
+  line-height: 1.14;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
 }
 
 .site-shell {
@@ -179,7 +187,8 @@ h3 {
 .nav {
   display: flex;
   gap: 18px;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
   color: var(--muted);
 }
 
@@ -229,14 +238,14 @@ h3 {
 .signal-label,
 .tile-index {
   font-family: "IBM Plex Mono", monospace;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
 }
 
 .eyebrow,
 .section-label {
   color: var(--accent-strong);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   margin-bottom: 16px;
 }
 
@@ -249,7 +258,8 @@ h3 {
   margin-top: 24px;
   max-width: 62ch;
   color: var(--muted);
-  font-size: 1.05rem;
+  font-size: 1.02rem;
+  line-height: 1.82;
 }
 
 .hero-actions {
@@ -347,7 +357,7 @@ h3 {
 .status-tile h2,
 .feature-card h3 {
   margin-top: 12px;
-  font-size: 1.35rem;
+  font-size: 1.28rem;
 }
 
 .status-tile p,
@@ -356,6 +366,7 @@ h3 {
 .metric-label,
 .contact-section p {
   color: var(--muted);
+  line-height: 1.68;
 }
 
 .profile-band {
@@ -464,14 +475,15 @@ h3 {
 }
 
 .social-card h3 {
-  font-size: 1.12rem;
+  font-size: 1.08rem;
+  line-height: 1.3;
 }
 
 .platform-pill {
   justify-self: start;
   font-family: "IBM Plex Mono", monospace;
   font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--accent-strong);
   border: 1px solid rgba(143, 240, 212, 0.28);
@@ -482,13 +494,15 @@ h3 {
 .social-card p {
   color: var(--muted);
   font-size: 0.94rem;
+  line-height: 1.66;
 }
 
 .social-link {
   justify-self: start;
   color: var(--text);
   font-weight: 600;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   transition:
     border-color 180ms ease,
@@ -504,8 +518,8 @@ h3 {
 .social-summary {
   color: var(--muted);
   font-family: "IBM Plex Mono", monospace;
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
+  font-size: 0.77rem;
+  letter-spacing: 0.03em;
 }
 
 .metric {
@@ -542,7 +556,8 @@ h3 {
 
 .contact-line {
   color: var(--text) !important;
-  font-size: 1.04rem;
+  font-size: 1rem;
+  line-height: 1.58;
 }
 
 .contact-links {
@@ -556,7 +571,8 @@ h3 {
 .contact-link {
   display: inline-block;
   color: var(--accent-strong);
-  font-size: 0.96rem;
+  font-size: 0.92rem;
+  line-height: 1.5;
   letter-spacing: 0.01em;
   border-bottom: 1px solid rgba(143, 240, 212, 0.24);
   transition:
