@@ -3,3 +3,170 @@
 Personal profile site for Sean, callsign N7SIX, a licensed amateur radio operator in the Philippines, contributor to the UV-K series firmware, and professional in the automotive industry.
 
 Published at https://n7six.github.io/MyProfile
+
+## Usage Monitoring (IP, Country, Counter)
+
+You can monitor usage from a static GitHub Pages site by sending events to a small backend endpoint.
+
+This repository now includes a starter backend in [monitoring/cloudflare-worker.js](monitoring/cloudflare-worker.js) with D1 schema in [monitoring/schema.sql](monitoring/schema.sql).
+
+### What it captures
+
+- Event count (total usage)
+- Country (from Cloudflare edge)
+- IP address (from Cloudflare request headers)
+- Action-specific counts (for example button clicks)
+- Public counter value for this site (`/count` endpoint)
+
+### Setup
+
+1. Install Wrangler and login:
+
+	```bash
+	npm install -g wrangler
+	wrangler login
+	```
+
+2. Create a D1 database and apply schema:
+
+	```bash
+	wrangler d1 create uvtools-usage
+	wrangler d1 execute uvtools-usage --file=./monitoring/schema.sql
+	```
+
+3. Copy [monitoring/wrangler.toml.example](monitoring/wrangler.toml.example) to `monitoring/wrangler.toml` and set your `database_id`.
+
+4. Add worker secrets:
+
+	```bash
+	wrangler secret put WRITE_KEY
+	wrangler secret put ADMIN_TOKEN
+	wrangler secret put ALLOWED_ORIGINS
+	```
+
+	Example `ALLOWED_ORIGINS` value:
+	`https://n7six.github.io,https://n7six.github.io/MyProfile`
+
+5. Deploy worker:
+
+	```bash
+	cd monitoring
+	wrangler deploy
+	```
+
+	If you are in the repo root, a full one-shot command flow is:
+
+	```bash
+	npm install -g wrangler && \
+	wrangler login && \
+	wrangler d1 create uvtools-usage && \
+	wrangler d1 execute uvtools-usage --file=./monitoring/schema.sql
+	```
+
+	Then set secrets:
+
+	```bash
+	wrangler secret put WRITE_KEY
+	wrangler secret put ADMIN_TOKEN
+	wrangler secret put ALLOWED_ORIGINS
+	```
+
+	Then deploy:
+
+	```bash
+	cd monitoring
+	wrangler deploy
+	```
+
+6. Update tracker config in [script.js](script.js):
+	- `USAGE_TRACKER.eventEndpoint`
+	- `USAGE_TRACKER.publicCountEndpoint`
+	- `USAGE_TRACKER.publicTrendEndpoint`
+	- `USAGE_TRACKER.publicCountriesEndpoint`
+	- `USAGE_TRACKER.writeKey`
+	- `USAGE_TRACKER.site`
+	- `USAGE_TRACKER.countRefreshMs` (optional counter auto-refresh interval)
+	- `USAGE_TRACKER.trendHours` (public trend window, default 24)
+	- `USAGE_TRACKER.countriesLimit` (how many top countries to display)
+
+	This site already includes a top-bar counter that reads from `/count` and displays `Uses: <number>`.
+	It also includes a dedicated Usage section on the page with animated count-up, last updated timestamp, a 24-hour trend sparkline, and top-country mini chart.
+
+7. Track specific usage actions by adding attributes on elements:
+
+	```html
+	<button data-track-event="flash_start_click" data-track-label="Flash Start">Flash</button>
+	```
+
+	Every click on an element with `data-track-event` sends an event record.
+
+### Fetch stats
+
+Call:
+
+```bash
+curl "https://<your-worker>.workers.dev/stats?site=uvtools-multi-firmware-web-flasher&token=<ADMIN_TOKEN>"
+```
+
+Public counter endpoint (no admin token):
+
+```bash
+curl "https://<your-worker>.workers.dev/count?site=n7six-myprofile-website"
+```
+
+Public trend endpoint (no admin token, aggregated counts only):
+
+```bash
+curl "https://<your-worker>.workers.dev/trend?site=n7six-myprofile-website&hours=24"
+```
+
+Public countries endpoint (no admin token, aggregated counts only):
+
+```bash
+curl "https://<your-worker>.workers.dev/countries?site=n7six-myprofile-website&limit=6"
+```
+
+The response includes:
+
+- Total events
+- Unique IP count
+- Country breakdown
+- Event breakdown (by event name)
+- Recent usage records
+
+To get counts per action, run this query on D1:
+
+```sql
+SELECT event, COUNT(*) as count
+FROM usage_events
+WHERE site = 'uvtools-multi-firmware-web-flasher'
+GROUP BY event
+ORDER BY count DESC;
+```
+
+### Built-in dashboard page
+
+This repo now includes [usage-dashboard.html](usage-dashboard.html) with script/styles in [usage-dashboard.js](usage-dashboard.js) and [usage-dashboard.css](usage-dashboard.css).
+
+Open this page in your browser and enter:
+
+- Worker URL (without `/stats`)
+- Site ID
+- Admin token
+
+It renders:
+
+- Total events
+- Unique IPs
+- Event counters
+- Country counters
+- Recent records (including IP)
+
+### Important note
+
+IP addresses are personal data in many jurisdictions. Add a privacy notice to your site and comply with local laws (for example GDPR/CCPA where applicable).
+
+Security note:
+
+- Set `ALLOWED_ORIGINS` so only your domains can send events.
+- `WRITE_KEY` is optional in this setup. If set, the client must send the same key.

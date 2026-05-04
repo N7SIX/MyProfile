@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Usage Dashboard</title>
+    <link rel="stylesheet" href="usage-dashboard.css" />
+  </head>
+  <body>
+    <main class="dashboard-shell">
+      <header class="dashboard-header">
+        <h1>Usage Dashboard</h1>
+        <p>View usage totals, countries, IPs, and action counters.</p>
+      </header>
+
+      <section class="controls" aria-label="Dashboard filters">
+        <label>
+          Worker URL
+          <input id="worker-url" type="url" placeholder="https://your-worker.workers.dev" />
+        </label>
+        <label>
+          Site ID
+          <input id="site-id" type="text" placeholder="uvtools-multi-firmware-web-flasher" />
+        </label>
+        <label>
+          Admin Token
+          <input id="admin-token" type="password" placeholder="ADMIN_TOKEN" />
+        </label>
+        <button id="load-stats" type="button">Load Stats</button>
+      </section>
+
+      <section class="kpi-grid" aria-label="Summary metrics">
+        <article class="kpi-card">
+          <h2>Total Events</h2>
+          <p id="kpi-total">0</p>
+        </article>
+        <article class="kpi-card">
+          <h2>Unique IPs</h2>
+          <p id="kpi-ips">0</p>
+        </article>
+      </section>
+
+      <section class="table-section">
+        <h2>By Event</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody id="event-rows"></tbody>
+        </table>
+      </section>
+
+      <section class="table-section">
+        <h2>By Country</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Country</th>
+              <th>Count</th>
+            </tr>
+          </thead>
+          <tbody id="country-rows"></tbody>
+        </table>
+      </section>
+
+      <section class="table-section">
+        <h2>Recent Events</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Event</th>
+              <th>Country</th>
+              <th>IP</th>
+              <th>Path</th>
+            </tr>
+          </thead>
+          <tbody id="recent-rows"></tbody>
+        </table>
+      </section>
+
+      <p id="status" class="status" aria-live="polite"></p>
+    </main>
+
+    <script src="usage-dashboard.js"></script>
+  </body>
+</html>

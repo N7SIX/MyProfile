@@ -28,11 +28,14 @@
         </a>
 
         <nav class="nav" aria-label="Primary navigation">
+          <a href="#usage">Usage</a>
           <a href="#profile">Profile</a>
           <a href="#radio">Radio</a>
           <a href="#social">Social</a>
           <a href="#contact">Contact</a>
         </nav>
+
+        <p class="usage-pill" id="usage-counter" aria-live="polite">Uses: --</p>
       </header>
 
       <main id="home">
@@ -50,8 +53,8 @@
               technical topics.
             </p>
             <div class="hero-actions">
-              <a class="button button-primary" href="#radio">View Profile</a>
-              <a class="button button-secondary" href="#social">See Links</a>
+              <a class="button button-primary" href="#radio" data-track-event="hero_view_profile_click" data-track-label="View Profile">View Profile</a>
+              <a class="button button-secondary" href="#social" data-track-event="hero_see_links_click" data-track-label="See Links">See Links</a>
             </div>
           </div>
 
@@ -80,6 +83,30 @@
               </article>
             </div>
           </aside>
+        </section>
+
+        <section id="usage" class="section usage-section reveal" aria-label="Site usage metrics">
+          <div class="usage-shell interactive-card">
+            <p class="section-label">Site Activity</p>
+            <h2>This website has been used</h2>
+            <p id="usage-total" class="usage-total">--</p>
+            <p class="usage-caption">times recorded by the live public counter.</p>
+            <p id="usage-last-updated" class="usage-last-updated">Last updated: --</p>
+            <div class="usage-trend" aria-label="Usage trend for last 24 hours">
+              <div class="usage-trend-head">
+                <strong>Last 24h Trend</strong>
+                <span id="usage-trend-peak">Peak hour: --</span>
+              </div>
+              <svg id="usage-trend-chart" viewBox="0 0 520 120" role="img" aria-label="Usage trend line chart"></svg>
+            </div>
+            <div class="usage-countries" aria-label="Top countries">
+              <div class="usage-countries-head">
+                <strong>Top Countries</strong>
+                <span id="usage-countries-total">Total countries: --</span>
+              </div>
+              <div id="usage-countries-list" class="usage-countries-list"></div>
+            </div>
+          </div>
         </section>
 
         <section id="profile" class="section profile-band reveal">
@@ -171,19 +198,19 @@
             <p class="contact-line">Amateurwire No.: 1182</p>
             <ul class="contact-links" aria-label="Contact links">
               <li>
-                <a class="contact-link" href="mailto:n7six@amateurwire.org">Email: n7six@amateurwire.org</a>
+                <a class="contact-link" href="mailto:n7six@amateurwire.org" data-track-event="contact_email_click" data-track-label="Email">Email: n7six@amateurwire.org</a>
               </li>
               <li>
-                <a class="contact-link" href="https://www.qrz.com/db/N7SIX" target="_blank" rel="noopener noreferrer">QRZ: qrz.com/db/N7SIX</a>
+                <a class="contact-link" href="https://www.qrz.com/db/N7SIX" target="_blank" rel="noopener noreferrer" data-track-event="contact_qrz_click" data-track-label="QRZ">QRZ: qrz.com/db/N7SIX</a>
               </li>
               <li>
-                <a class="contact-link" href="https://web.facebook.com/N7SIX" target="_blank" rel="noopener noreferrer">Facebook: web.facebook.com/N7SIX</a>
+                <a class="contact-link" href="https://web.facebook.com/N7SIX" target="_blank" rel="noopener noreferrer" data-track-event="contact_facebook_click" data-track-label="Facebook">Facebook: web.facebook.com/N7SIX</a>
               </li>
               <li>
-                <a class="contact-link" href="https://www.youtube.com/@N7SIX" target="_blank" rel="noopener noreferrer">YouTube: youtube.com/@N7SIX</a>
+                <a class="contact-link" href="https://www.youtube.com/@N7SIX" target="_blank" rel="noopener noreferrer" data-track-event="contact_youtube_click" data-track-label="YouTube">YouTube: youtube.com/@N7SIX</a>
               </li>
               <li>
-                <a class="contact-link" href="https://github.com/N7SIX" target="_blank" rel="noopener noreferrer">GitHub: github.com/N7SIX</a>
+                <a class="contact-link" href="https://github.com/N7SIX" target="_blank" rel="noopener noreferrer" data-track-event="contact_github_click" data-track-label="GitHub">GitHub: github.com/N7SIX</a>
               </li>
             </ul>
           </div>
