@@ -1,6 +1,7 @@
 const workerUrlInput = document.getElementById('worker-url');
 const siteIdInput = document.getElementById('site-id');
 const adminTokenInput = document.getElementById('admin-token');
+const adminTokenGroup = document.getElementById('admin-token-group');
 const loadStatsButton = document.getElementById('load-stats');
 const kpiTotal = document.getElementById('kpi-total');
 const kpiIps = document.getElementById('kpi-ips');
@@ -10,6 +11,20 @@ const recentRows = document.getElementById('recent-rows');
 const statusNode = document.getElementById('status');
 
 const STORAGE_KEY = 'uvtools-dashboard-config-v1';
+const DEFAULT_MONITOR_CONFIG = {
+  workerUrl: '',
+  siteId: 'uvtools-multi-firmware-web-flasher',
+  adminToken: '',
+  autoLoad: true,
+  autoRefreshMs: 60000,
+  hideAdminTokenField: true,
+};
+const externalMonitorConfig =
+  window.USAGE_MONITOR_CONFIG && typeof window.USAGE_MONITOR_CONFIG === 'object'
+    ? window.USAGE_MONITOR_CONFIG
+    : {};
+
+let autoRefreshTimer = 0;
 
 const setStatus = (message, isError = false) => {
   statusNode.textContent = message;
@@ -56,6 +71,45 @@ const loadSavedConfig = () => {
   } catch {
     window.localStorage.removeItem(STORAGE_KEY);
   }
+};
+
+const loadQueryConfig = () => {
+  const params = new URLSearchParams(window.location.search);
+
+  return {
+    workerUrl: (params.get('worker') || '').trim(),
+    siteId: (params.get('site') || '').trim(),
+    adminToken: (params.get('token') || '').trim(),
+    showTokenField: params.get('showTokenField') === '1',
+  };
+};
+
+const resolveConfig = () => {
+  const saved = (() => {
+    const raw = window.localStorage.getItem(STORAGE_KEY);
+
+    if (!raw) {
+      return {};
+    }
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      window.localStorage.removeItem(STORAGE_KEY);
+      return {};
+    }
+  })();
+
+  const query = loadQueryConfig();
+
+  return {
+    ...DEFAULT_MONITOR_CONFIG,
+    ...externalMonitorConfig,
+    ...saved,
+    ...Object.fromEntries(
+      Object.entries(query).filter(([, value]) => Boolean(value))
+    ),
+  };
 };
 
 const saveConfig = (workerUrl, siteId, adminToken) => {
@@ -132,5 +186,61 @@ const fetchStats = async () => {
   }
 };
 
-loadSavedConfig();
+const applyConfigToInputs = (config) => {
+  workerUrlInput.value = config.workerUrl || '';
+  siteIdInput.value = config.siteId || '';
+  adminTokenInput.value = config.adminToken || '';
+};
+
+const applyAutoVisibility = (config) => {
+  if (!adminTokenGroup) {
+    return;
+  }
+
+  const shouldHide =
+    Boolean(config.hideAdminTokenField) &&
+    Boolean((config.adminToken || '').trim()) &&
+    !Boolean(config.showTokenField);
+
+  adminTokenGroup.classList.toggle('is-hidden', shouldHide);
+};
+
+const maybeAutoLoad = (config) => {
+  if (!config.autoLoad) {
+    return;
+  }
+
+  if (!workerUrlInput.value.trim() || !siteIdInput.value.trim() || !adminTokenInput.value.trim()) {
+    return;
+  }
+
+  fetchStats();
+};
+
+const setupAutoRefresh = (config) => {
+  if (autoRefreshTimer) {
+    window.clearInterval(autoRefreshTimer);
+    autoRefreshTimer = 0;
+  }
+
+  const intervalMs = Number(config.autoRefreshMs || 0);
+
+  if (!Number.isFinite(intervalMs) || intervalMs <= 0) {
+    return;
+  }
+
+  autoRefreshTimer = window.setInterval(fetchStats, intervalMs);
+};
+
+const resolvedConfig = resolveConfig();
+applyConfigToInputs(resolvedConfig);
+applyAutoVisibility(resolvedConfig);
+saveConfig(
+  (resolvedConfig.workerUrl || '').trim().replace(/\/$/, ''),
+  (resolvedConfig.siteId || '').trim(),
+  (resolvedConfig.adminToken || '').trim()
+);
+setupAutoRefresh(resolvedConfig);
+maybeAutoLoad(resolvedConfig);
+
 loadStatsButton.addEventListener('click', fetchStats);

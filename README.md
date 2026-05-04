@@ -92,6 +92,9 @@ This repository now includes a starter backend in [monitoring/cloudflare-worker.
 	This site already includes a top-bar counter that reads from `/count` and displays `Uses: <number>`.
 	It also includes a dedicated Usage section on the page with animated count-up, last updated timestamp, a 24-hour trend sparkline, and top-country mini chart.
 
+Automatic mode is available using [usage-tracker-config.js](usage-tracker-config.js), which is loaded by [index.html](index.html).
+Edit this file once and the website tracker uses those values automatically.
+
 7. Track specific usage actions by adding attributes on elements:
 
 	```html
@@ -147,6 +150,17 @@ ORDER BY count DESC;
 ### Built-in dashboard page
 
 This repo now includes [usage-dashboard.html](usage-dashboard.html) with script/styles in [usage-dashboard.js](usage-dashboard.js) and [usage-dashboard.css](usage-dashboard.css).
+
+Dashboard automatic mode:
+
+- [usage-dashboard.html](usage-dashboard.html) loads [usage-monitor-config.js](usage-monitor-config.js)
+- Set `workerUrl`, `siteId`, and `adminToken` there
+- With `autoLoad: true`, stats load automatically on page open
+- With `autoRefreshMs`, dashboard refreshes automatically
+- With `hideAdminTokenField: true`, token input is hidden if token is already set
+- You can also override values with URL parameters:
+	`usage-dashboard.html?worker=https://...workers.dev&site=uvtools-multi-firmware-web-flasher&token=...`
+- Add `&showTokenField=1` to force-show the token input when needed
 
 Open this page in your browser and enter:
 

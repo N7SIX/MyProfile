@@ -146,6 +146,10 @@ th {
   color: var(--danger);
 }
 
+.is-hidden {
+  display: none !important;
+}
+
 @media (max-width: 960px) {
   .controls {
     grid-template-columns: 1fr;

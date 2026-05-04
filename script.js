@@ -12,7 +12,7 @@ const usageTrendPeakNode = document.getElementById('usage-trend-peak');
 const usageCountriesTotalNode = document.getElementById('usage-countries-total');
 const usageCountriesListNode = document.getElementById('usage-countries-list');
 
-const USAGE_TRACKER = {
+const DEFAULT_USAGE_TRACKER = {
   eventEndpoint: 'https://your-worker-subdomain.workers.dev/event',
   publicCountEndpoint: 'https://your-worker-subdomain.workers.dev/count',
   publicTrendEndpoint: 'https://your-worker-subdomain.workers.dev/trend',
@@ -23,6 +23,16 @@ const USAGE_TRACKER = {
   countRefreshMs: 60000,
   trendHours: 24,
   countriesLimit: 6,
+};
+
+const externalUsageTrackerConfig =
+  window.USAGE_TRACKER_CONFIG && typeof window.USAGE_TRACKER_CONFIG === 'object'
+    ? window.USAGE_TRACKER_CONFIG
+    : {};
+
+const USAGE_TRACKER = {
+  ...DEFAULT_USAGE_TRACKER,
+  ...externalUsageTrackerConfig,
 };
 
 let lastCountValue = 0;
