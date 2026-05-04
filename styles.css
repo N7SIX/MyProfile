@@ -73,13 +73,13 @@ body {
   bottom: 5%;
   width: min(30vw, 420px);
   aspect-ratio: 1 / 1;
-  background-image: url("MyLogo/450875247_460375390191488_7588395686666713118_n.jpg");
+  background-image: url("MyLogo/logo-transparent.png");
   background-size: contain;
   background-position: center;
-  opacity: 0.34;
-  filter: grayscale(0.05) saturate(1.05) contrast(1.18) brightness(0.86);
+  opacity: 0.23;
+  filter: grayscale(0.08) saturate(0.98) contrast(1.06);
   transform: rotate(-5deg);
-  mix-blend-mode: multiply;
+  mix-blend-mode: normal;
 }
 
 .background-canvas {
@@ -659,7 +659,7 @@ h3 {
     width: min(52vw, 280px);
     left: 4%;
     bottom: 4%;
-    opacity: 0.28;
+    opacity: 0.2;
   }
 }
 
