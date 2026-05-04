@@ -34,6 +34,13 @@ const socialProfiles = [
     displayUrl: 'youtube.com/@N7SIX',
     note: 'I share radio and development-related video content here from time to time.',
   },
+  {
+    platform: 'GitHub',
+    title: 'GitHub',
+    href: 'https://github.com/N7SIX',
+    displayUrl: 'github.com/N7SIX',
+    note: 'My GitHub profile with code and project repositories.',
+  },
 ];
 
 if (socialFeed && socialSummary) {
