@@ -5,6 +5,8 @@ const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 const socialFeed = document.getElementById('social-feed');
 const socialSummary = document.getElementById('social-summary');
 
+document.documentElement.classList.add('reveal-ready');
+
 const socialProfiles = [
   {
     platform: 'Email',

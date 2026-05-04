@@ -882,7 +882,7 @@ h3 {
   opacity: 1;
 }
 
-.js-enabled .reveal {
+html.reveal-ready .reveal {
   opacity: 0;
   transform: translateY(28px);
   transition:
@@ -890,7 +890,7 @@ h3 {
     transform 650ms ease;
 }
 
-.js-enabled .reveal.is-visible {
+html.reveal-ready .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
