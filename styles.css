@@ -219,14 +219,14 @@ h3 {
 }
 
 .brand-mark {
-  display: grid;
-  place-items: center;
+  display: block;
   width: 42px;
   height: 42px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(64, 210, 164, 0.18), rgba(246, 168, 95, 0.3));
+  object-fit: cover;
+  object-position: center;
+  background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  font-weight: 700;
 }
 
 .brand-copy {
