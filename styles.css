@@ -15,6 +15,62 @@
   --max-width: 1180px;
 }
 
+@font-face {
+  font-family: "Hyundai Sans Head";
+  src: url("Fonts/HyundaiSansHeadKRLight.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hyundai Sans Head";
+  src: url("Fonts/HyundaiSansHeadKRRegular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hyundai Sans Head";
+  src: url("Fonts/HyundaiSansHeadKRMedium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hyundai Sans Head";
+  src: url("Fonts/HyundaiSansHeadKRBold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hyundai Sans Text";
+  src: url("Fonts/HyundaiSansTextKRRegular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hyundai Sans Text";
+  src: url("Fonts/HyundaiSansTextKRMedium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Hyundai Sans Text";
+  src: url("Fonts/HyundaiSansTextKRBold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -28,7 +84,7 @@ body {
   min-height: 100vh;
   position: relative;
   isolation: isolate;
-  font-family: "Sora", sans-serif;
+  font-family: "Hyundai Sans Text", sans-serif;
   font-weight: 400;
   color: var(--text);
   text-rendering: optimizeLegibility;
@@ -128,6 +184,8 @@ h3 {
   line-height: 1.14;
   letter-spacing: -0.015em;
   text-wrap: balance;
+  font-family: "Hyundai Sans Head", sans-serif;
+  font-weight: 500;
 }
 
 .site-shell {
@@ -237,9 +295,10 @@ h3 {
 .feature-tag,
 .signal-label,
 .tile-index {
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Hyundai Sans Head", sans-serif;
   letter-spacing: 0.11em;
   text-transform: uppercase;
+  font-weight: 500;
 }
 
 .eyebrow,
@@ -481,7 +540,7 @@ h3 {
 
 .platform-pill {
   justify-self: start;
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Hyundai Sans Head", sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -517,7 +576,7 @@ h3 {
 
 .social-summary {
   color: var(--muted);
-  font-family: "IBM Plex Mono", monospace;
+  font-family: "Hyundai Sans Head", sans-serif;
   font-size: 0.77rem;
   letter-spacing: 0.03em;
 }
