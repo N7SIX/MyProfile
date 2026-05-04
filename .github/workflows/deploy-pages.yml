@@ -1,0 +1,7 @@
+name: Deploy Pages
+on: workflow_dispatch
+jobs:
+  validate-workflow:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "deploy-pages.yml is valid YAML."
