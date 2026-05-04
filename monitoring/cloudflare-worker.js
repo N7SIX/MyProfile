@@ -34,6 +34,8 @@ export default {
 };
 
 async function handleEvent(request, env) {
+  await ensureSchema(env);
+
   const payload = await safeJson(request);
 
   if (!isAllowedRequestOrigin(request, env)) {
@@ -71,6 +73,8 @@ async function handleEvent(request, env) {
 }
 
 async function handleStats(request, env) {
+  await ensureSchema(env);
+
   const url = new URL(request.url);
   const token = url.searchParams.get('token') || '';
   const site = normalize(url.searchParams.get('site') || '', 120);
@@ -140,6 +144,8 @@ async function handleStats(request, env) {
 }
 
 async function handlePublicCount(request, env) {
+  await ensureSchema(env);
+
   const url = new URL(request.url);
   const site = normalize(url.searchParams.get('site') || '', 120);
 
@@ -167,6 +173,8 @@ async function handlePublicCount(request, env) {
 }
 
 async function handlePublicTrend(request, env) {
+  await ensureSchema(env);
+
   const url = new URL(request.url);
   const site = normalize(url.searchParams.get('site') || '', 120);
   const requestedHours = Number.parseInt(url.searchParams.get('hours') || '24', 10);
@@ -221,6 +229,8 @@ async function handlePublicTrend(request, env) {
 }
 
 async function handlePublicCountries(request, env) {
+  await ensureSchema(env);
+
   const url = new URL(request.url);
   const site = normalize(url.searchParams.get('site') || '', 120);
   const requestedLimit = Number.parseInt(url.searchParams.get('limit') || '6', 10);
@@ -319,4 +329,48 @@ function normalize(value, maxLen) {
   }
 
   return value.trim().slice(0, maxLen);
+}
+
+let schemaInitPromise = null;
+
+async function ensureSchema(env) {
+  if (schemaInitPromise) {
+    return schemaInitPromise;
+  }
+
+  schemaInitPromise = (async () => {
+    await env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS usage_events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        site TEXT NOT NULL,
+        event TEXT NOT NULL,
+        ip_address TEXT NOT NULL,
+        country TEXT NOT NULL,
+        path TEXT,
+        referrer TEXT,
+        user_agent TEXT,
+        created_at TEXT NOT NULL DEFAULT (datetime('now'))
+      )`
+    ).run();
+
+    await env.DB.prepare(
+      `CREATE INDEX IF NOT EXISTS idx_usage_events_site_created
+        ON usage_events (site, created_at DESC)`
+    ).run();
+
+    await env.DB.prepare(
+      `CREATE INDEX IF NOT EXISTS idx_usage_events_site_country
+        ON usage_events (site, country)`
+    ).run();
+
+    await env.DB.prepare(
+      `CREATE INDEX IF NOT EXISTS idx_usage_events_site_ip
+        ON usage_events (site, ip_address)`
+    ).run();
+  })().catch((error) => {
+    schemaInitPromise = null;
+    throw error;
+  });
+
+  return schemaInitPromise;
 }
