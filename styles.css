@@ -449,7 +449,19 @@ h3 {
 }
 
 .hamclock-card-compact {
-  min-height: 112px;
+  padding: 10px;
+  min-height: 92px;
+}
+
+.hamclock-card-compact .hamclock-value {
+  margin-top: 6px;
+  font-size: clamp(1.18rem, 2.1vw, 1.7rem);
+}
+
+.hamclock-card-compact .hamclock-sub {
+  margin-top: 4px;
+  font-size: 0.76rem;
+  line-height: 1.35;
 }
 
 .hamclock-ops-card {
@@ -458,7 +470,8 @@ h3 {
 
 .hamclock-panel-card {
   grid-column: span 4;
-  min-height: 220px;
+  padding: 11px;
+  min-height: 172px;
 }
 
 .hamclock-map-card {
@@ -550,10 +563,7 @@ h3 {
 
 .hamclock-map-layout {
   margin-top: 10px;
-  display: grid;
-  grid-template-columns: minmax(0, 1.82fr) minmax(260px, 0.62fr);
-  gap: 12px;
-  align-items: stretch;
+  display: block;
 }
 
 .hamclock-cluster {
@@ -561,7 +571,11 @@ h3 {
   border-radius: 10px;
   background: rgba(8, 22, 39, 0.76);
   padding: 10px;
-  min-height: 420px;
+  min-height: 162px;
+}
+
+.hamclock-cluster-below {
+  margin-top: 10px;
 }
 
 .hamclock-cluster-head {
@@ -586,7 +600,7 @@ h3 {
   list-style: none;
   display: grid;
   gap: 6px;
-  max-height: 378px;
+  max-height: 180px;
   overflow: auto;
 }
 
@@ -648,15 +662,16 @@ h3 {
 
 .hamclock-telemetry-card {
   grid-column: span 3;
-  min-height: 156px;
+  padding: 10px;
+  min-height: 132px;
 }
 
 .hamclock-telemetry-list {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 6px;
+  gap: 5px;
 }
 
 .hamclock-telemetry-list li {
@@ -664,7 +679,7 @@ h3 {
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  padding: 5px 6px;
+  padding: 4px 6px;
   border: 1px solid rgba(148, 178, 213, 0.14);
   border-radius: 8px;
   background: rgba(10, 29, 50, 0.55);
@@ -672,13 +687,13 @@ h3 {
 
 .hamclock-telemetry-list span {
   color: var(--muted);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
 }
 
 .hamclock-telemetry-list strong {
   color: var(--text);
   font-family: "Hyundai Sans Head", sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 .hamclock-band-meter {
@@ -1444,10 +1459,6 @@ html[data-js-state="error"] .runtime-status {
     min-height: 320px;
   }
 
-  .hamclock-map-layout {
-    grid-template-columns: 1fr;
-  }
-
   .hero {
     padding-top: 64px;
     gap: 22px;
@@ -1524,6 +1535,10 @@ html[data-js-state="error"] .runtime-status {
   #hc-world-map,
   .hamclock-cluster {
     min-height: 250px;
+  }
+
+  .hamclock-cluster-list {
+    max-height: 150px;
   }
 
   .hamclock-sun-grid {
