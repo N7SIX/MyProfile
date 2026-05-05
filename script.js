@@ -16,10 +16,13 @@ const hamClockNodes = {
   solarWindow: document.getElementById('hc-solar-window'),
   bandNow: document.getElementById('hc-band-now'),
   bandNext: document.getElementById('hc-band-next'),
+  bandMeter: document.getElementById('hc-band-meter'),
   targetSelect: document.getElementById('hc-target-select'),
   dxTarget: document.getElementById('hc-dx-target'),
   dxBearing: document.getElementById('hc-dx-bearing'),
   dxDistance: document.getElementById('hc-dx-distance'),
+  compass: document.getElementById('hc-compass'),
+  daylightArc: document.getElementById('hc-daylight-arc'),
 };
 
 const STATION_PROFILE = {
@@ -295,6 +298,8 @@ function initializeHamClockPanel() {
     hamClockNodes.grid.textContent = toMaidenhead(STATION_PROFILE.lat, STATION_PROFILE.lon, 6);
   }
 
+  setupBandMeter();
+
   const updateClockData = () => {
     const now = new Date();
     const utcHour = now.getUTCHours();
@@ -326,6 +331,8 @@ function initializeHamClockPanel() {
     if (hamClockNodes.bandNext) {
       hamClockNodes.bandNext.textContent = `Next: ${bandPlan.next}`;
     }
+
+    updateBandMeter(utcHour);
   };
 
   updateClockData();
@@ -481,6 +488,8 @@ async function loadSunTimes() {
     if (hamClockNodes.solarWindow) {
       hamClockNodes.solarWindow.textContent = `Daylight window: ${daylightHours.toFixed(1)} hours`;
     }
+
+    renderDaylightArc(sunrise, sunset);
   } catch {
     if (hamClockNodes.sunrise) {
       hamClockNodes.sunrise.textContent = 'Sunrise: unavailable';
@@ -493,6 +502,8 @@ async function loadSunTimes() {
     if (hamClockNodes.solarWindow) {
       hamClockNodes.solarWindow.textContent = 'Daylight window: unavailable';
     }
+
+    renderDaylightArc(null, null);
   }
 }
 
@@ -513,6 +524,181 @@ function updateDxHeading() {
   if (hamClockNodes.dxDistance) {
     hamClockNodes.dxDistance.textContent = `Distance: ${distanceKm.toLocaleString(undefined, { maximumFractionDigits: 0 })} km`;
   }
+
+  renderCompass(bearing, target.label);
+}
+
+function setupBandMeter() {
+  if (!hamClockNodes.bandMeter) {
+    return;
+  }
+
+  hamClockNodes.bandMeter.innerHTML = ['80m', '40m', '20m', '17m', '15m', '10m']
+    .map((band) => `
+      <div class="hamclock-band-row" data-band="${band}">
+        <span class="hamclock-band-name">${band}</span>
+        <div class="hamclock-band-track">
+          <div class="hamclock-band-fill" style="width: 0%"></div>
+        </div>
+      </div>
+    `)
+    .join('');
+}
+
+function updateBandMeter(utcHour) {
+  if (!hamClockNodes.bandMeter) {
+    return;
+  }
+
+  const baseProfile = getBandStrengthProfile(utcHour);
+  const bandRows = hamClockNodes.bandMeter.querySelectorAll('.hamclock-band-row');
+
+  bandRows.forEach((row) => {
+    const band = row.getAttribute('data-band') || '';
+    const fill = row.querySelector('.hamclock-band-fill');
+    const strength = Math.max(0, Math.min(100, Number(baseProfile[band] || 0)));
+
+    if (fill) {
+      fill.style.width = `${strength}%`;
+    }
+  });
+}
+
+function getBandStrengthProfile(utcHour) {
+  if (utcHour < 5) {
+    return { '80m': 88, '40m': 84, '20m': 34, '17m': 20, '15m': 12, '10m': 8 };
+  }
+
+  if (utcHour < 9) {
+    return { '80m': 40, '40m': 58, '20m': 92, '17m': 70, '15m': 56, '10m': 30 };
+  }
+
+  if (utcHour < 13) {
+    return { '80m': 16, '40m': 28, '20m': 86, '17m': 88, '15m': 78, '10m': 44 };
+  }
+
+  if (utcHour < 18) {
+    return { '80m': 18, '40m': 36, '20m': 90, '17m': 74, '15m': 66, '10m': 38 };
+  }
+
+  if (utcHour < 22) {
+    return { '80m': 58, '40m': 90, '20m': 62, '17m': 36, '15m': 22, '10m': 10 };
+  }
+
+  return { '80m': 82, '40m': 86, '20m': 46, '17m': 24, '15m': 14, '10m': 8 };
+}
+
+function renderCompass(bearing, targetLabel) {
+  if (!hamClockNodes.compass) {
+    return;
+  }
+
+  const center = 110;
+  const radius = 86;
+  const angle = toRadians(Number(bearing || 0) - 90);
+  const tipX = center + (Math.cos(angle) * (radius - 8));
+  const tipY = center + (Math.sin(angle) * (radius - 8));
+  const backX = center - (Math.cos(angle) * 28);
+  const backY = center - (Math.sin(angle) * 28);
+  const leftX = backX + (Math.cos(angle + (Math.PI / 2)) * 8);
+  const leftY = backY + (Math.sin(angle + (Math.PI / 2)) * 8);
+  const rightX = backX + (Math.cos(angle - (Math.PI / 2)) * 8);
+  const rightY = backY + (Math.sin(angle - (Math.PI / 2)) * 8);
+
+  hamClockNodes.compass.innerHTML = `
+    <defs>
+      <radialGradient id="hcCompassBg" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(18, 45, 74, 0.95)"></stop>
+        <stop offset="100%" stop-color="rgba(6, 20, 37, 0.96)"></stop>
+      </radialGradient>
+    </defs>
+    <circle cx="${center}" cy="${center}" r="${radius + 6}" fill="url(#hcCompassBg)" stroke="rgba(151,170,195,0.22)" stroke-width="2"></circle>
+    <circle cx="${center}" cy="${center}" r="${radius - 14}" fill="none" stroke="rgba(151,170,195,0.22)" stroke-width="1"></circle>
+    ${buildCompassTicks(center, center, radius - 2)}
+    <text x="${center}" y="26" text-anchor="middle" fill="rgba(143,240,212,0.95)" font-size="11">N</text>
+    <text x="${center}" y="205" text-anchor="middle" fill="rgba(151,170,195,0.95)" font-size="11">S</text>
+    <text x="24" y="114" text-anchor="middle" fill="rgba(151,170,195,0.95)" font-size="11">W</text>
+    <text x="196" y="114" text-anchor="middle" fill="rgba(151,170,195,0.95)" font-size="11">E</text>
+    <polygon points="${tipX.toFixed(2)},${tipY.toFixed(2)} ${leftX.toFixed(2)},${leftY.toFixed(2)} ${rightX.toFixed(2)},${rightY.toFixed(2)}" fill="rgba(143,240,212,0.95)"></polygon>
+    <circle cx="${center}" cy="${center}" r="6" fill="rgba(246,168,95,0.95)"></circle>
+    <text x="${center}" y="219" text-anchor="middle" fill="rgba(151,170,195,0.9)" font-size="10">${escapeSvgText(targetLabel)}</text>
+  `;
+}
+
+function buildCompassTicks(cx, cy, radius) {
+  let tickMarkup = '';
+
+  for (let deg = 0; deg < 360; deg += 10) {
+    const outer = polarPoint(cx, cy, radius, deg - 90);
+    const innerDistance = deg % 30 === 0 ? radius - 10 : radius - 5;
+    const inner = polarPoint(cx, cy, innerDistance, deg - 90);
+    const stroke = deg % 30 === 0 ? 'rgba(236,244,255,0.65)' : 'rgba(151,170,195,0.35)';
+    tickMarkup += `<line x1="${outer.x.toFixed(2)}" y1="${outer.y.toFixed(2)}" x2="${inner.x.toFixed(2)}" y2="${inner.y.toFixed(2)}" stroke="${stroke}" stroke-width="1"></line>`;
+  }
+
+  return tickMarkup;
+}
+
+function renderDaylightArc(sunriseDate, sunsetDate) {
+  if (!hamClockNodes.daylightArc) {
+    return;
+  }
+
+  const width = 320;
+  const height = 120;
+  const cx = 160;
+  const cy = 98;
+  const radius = 78;
+
+  if (!sunriseDate || !sunsetDate) {
+    hamClockNodes.daylightArc.innerHTML = `
+      <rect x="0" y="0" width="${width}" height="${height}" rx="10" fill="rgba(9,26,44,0.72)"></rect>
+      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="rgba(151,170,195,0.95)" font-size="12">Solar arc unavailable</text>
+    `;
+    return;
+  }
+
+  const sunriseUtcHour = sunriseDate.getUTCHours() + (sunriseDate.getUTCMinutes() / 60);
+  const sunsetUtcHour = sunsetDate.getUTCHours() + (sunsetDate.getUTCMinutes() / 60);
+  const startDeg = ((sunriseUtcHour / 24) * 360) - 180;
+  const endDeg = ((sunsetUtcHour / 24) * 360) - 180;
+  const start = polarPoint(cx, cy, radius, startDeg);
+  const end = polarPoint(cx, cy, radius, endDeg);
+  const largeArc = Math.abs(endDeg - startDeg) > 180 ? 1 : 0;
+
+  hamClockNodes.daylightArc.innerHTML = `
+    <defs>
+      <linearGradient id="hcDayArc" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="rgba(246,168,95,0.9)"></stop>
+        <stop offset="100%" stop-color="rgba(143,240,212,0.9)"></stop>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="${width}" height="${height}" rx="10" fill="rgba(9,26,44,0.72)"></rect>
+    <path d="M ${polarPoint(cx, cy, radius, -180).x.toFixed(2)} ${polarPoint(cx, cy, radius, -180).y.toFixed(2)} A ${radius} ${radius} 0 0 1 ${polarPoint(cx, cy, radius, 0).x.toFixed(2)} ${polarPoint(cx, cy, radius, 0).y.toFixed(2)}" fill="none" stroke="rgba(151,170,195,0.25)" stroke-width="8" stroke-linecap="round"></path>
+    <path d="M ${start.x.toFixed(2)} ${start.y.toFixed(2)} A ${radius} ${radius} 0 ${largeArc} 1 ${end.x.toFixed(2)} ${end.y.toFixed(2)}" fill="none" stroke="url(#hcDayArc)" stroke-width="8" stroke-linecap="round"></path>
+    <circle cx="${start.x.toFixed(2)}" cy="${start.y.toFixed(2)}" r="4" fill="rgba(246,168,95,0.95)"></circle>
+    <circle cx="${end.x.toFixed(2)}" cy="${end.y.toFixed(2)}" r="4" fill="rgba(143,240,212,0.95)"></circle>
+    <text x="20" y="112" fill="rgba(151,170,195,0.85)" font-size="10">00Z</text>
+    <text x="152" y="112" fill="rgba(151,170,195,0.85)" font-size="10">12Z</text>
+    <text x="282" y="112" fill="rgba(151,170,195,0.85)" font-size="10">24Z</text>
+  `;
+}
+
+function polarPoint(cx, cy, radius, deg) {
+  const rad = toRadians(deg);
+  return {
+    x: cx + (Math.cos(rad) * radius),
+    y: cy + (Math.sin(rad) * radius),
+  };
+}
+
+function escapeSvgText(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }
 
 function calculateBearing(lat1, lon1, lat2, lon2) {

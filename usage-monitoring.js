@@ -154,6 +154,13 @@ const WORLD_LANDMASSES = [
   ],
 ];
 
+const WORLD_MAP_STATION = {
+  code: 'PH',
+  lat: 14.5995,
+  lon: 120.9842,
+  label: 'N7SIX QTH',
+};
+
 const trackUsageEvent = async (eventName, extra = {}) => {
   if (!USAGE_TRACKER.eventEndpoint || USAGE_TRACKER.eventEndpoint.includes('your-worker-subdomain')) {
     return;
@@ -408,29 +415,51 @@ const renderWorldMap = (countries, message) => {
     })
     .filter(Boolean);
 
+  const station = projectWorldPoint(WORLD_MAP_STATION.lon, WORLD_MAP_STATION.lat, width, height, pad);
+
   const markerSvg = markerEntries
     .map((entry) => `
-      <circle cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${entry.radius.toFixed(2)}" fill="rgba(143,240,212,0.86)" stroke="rgba(6,22,42,0.95)" stroke-width="1.3"></circle>
-      <text x="${(entry.x + 8).toFixed(2)}" y="${(entry.y - 8).toFixed(2)}" fill="rgba(236,244,255,0.9)" font-size="10" font-family="'Hyundai Sans Head', sans-serif">${escapeHtml(entry.code)}</text>
+      <g>
+        <circle cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${(entry.radius + 5).toFixed(2)}" fill="rgba(143,240,212,0.12)"></circle>
+        <circle cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${entry.radius.toFixed(2)}" fill="rgba(143,240,212,0.9)" stroke="rgba(8,28,49,0.92)" stroke-width="1.3"></circle>
+        <text x="${(entry.x + 9).toFixed(2)}" y="${(entry.y - 9).toFixed(2)}" fill="rgba(236,244,255,0.94)" font-size="10" font-family="'Hyundai Sans Head', sans-serif">${escapeHtml(entry.code)}</text>
+      </g>
     `)
     .join('');
+
+  const routeArcs = buildRouteArcs(station, markerEntries);
+
+  const stationMarkup = `
+    <g>
+      <circle cx="${station.x.toFixed(2)}" cy="${station.y.toFixed(2)}" r="11" fill="rgba(246,168,95,0.18)"></circle>
+      <circle cx="${station.x.toFixed(2)}" cy="${station.y.toFixed(2)}" r="5.6" fill="rgba(246,168,95,0.95)" stroke="rgba(8,24,42,0.95)" stroke-width="1.2"></circle>
+      <text x="${(station.x + 11).toFixed(2)}" y="${(station.y - 10).toFixed(2)}" fill="rgba(246,199,153,0.95)" font-size="10" font-family="'Hyundai Sans Head', sans-serif">N7SIX</text>
+    </g>
+  `;
 
   usageWorldMapNode.innerHTML = `
     <defs>
       <linearGradient id="mapBg" x1="0" x2="1" y1="0" y2="1">
-        <stop offset="0%" stop-color="rgba(14,36,63,0.95)"></stop>
-        <stop offset="100%" stop-color="rgba(8,22,40,0.98)"></stop>
+        <stop offset="0%" stop-color="rgba(10,35,63,0.95)"></stop>
+        <stop offset="100%" stop-color="rgba(6,18,34,0.98)"></stop>
       </linearGradient>
       <radialGradient id="mapGlow" cx="50%" cy="50%" r="70%">
-        <stop offset="0%" stop-color="rgba(64,210,164,0.20)"></stop>
+        <stop offset="0%" stop-color="rgba(64,210,164,0.16)"></stop>
         <stop offset="100%" stop-color="rgba(64,210,164,0.02)"></stop>
       </radialGradient>
+      <linearGradient id="mapRoute" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="rgba(246,168,95,0.55)"></stop>
+        <stop offset="100%" stop-color="rgba(143,240,212,0.72)"></stop>
+      </linearGradient>
     </defs>
-    <rect x="0" y="0" width="${width}" height="${height}" fill="url(#mapBg)"></rect>
-    <rect x="0" y="0" width="${width}" height="${height}" fill="url(#mapGlow)"></rect>
+    <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapBg)"></rect>
+    <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapGlow)"></rect>
     ${buildLandmassPaths(width, height, pad)}
     ${buildMapGrid(width, height, pad)}
+    ${routeArcs}
+    ${stationMarkup}
     ${markerSvg}
+    ${buildMapLabels(width, height)}
     ${message ? `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="rgba(151,170,195,0.95)" font-size="14">${escapeHtml(message)}</text>` : ''}
   `;
 
@@ -447,13 +476,13 @@ const buildMapGrid = (width, height, pad) => {
   for (let lon = -150; lon <= 150; lon += 30) {
     const start = projectWorldPoint(lon, -75, width, height, pad);
     const end = projectWorldPoint(lon, 75, width, height, pad);
-    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.12)" stroke-width="1"></line>`);
+    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.08)" stroke-width="1"></line>`);
   }
 
   for (let lat = -60; lat <= 60; lat += 30) {
     const start = projectWorldPoint(-180, lat, width, height, pad);
     const end = projectWorldPoint(180, lat, width, height, pad);
-    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.12)" stroke-width="1"></line>`);
+    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.08)" stroke-width="1"></line>`);
   }
 
   return lines.join('');
@@ -468,9 +497,28 @@ const buildLandmassPaths = (width, height, pad) => WORLD_LANDMASSES
       })
       .join(' ');
 
-    return `<path d="${path} Z" fill="rgba(53, 92, 124, 0.45)" stroke="rgba(143, 240, 212, 0.22)" stroke-width="1.1"></path>`;
+    return `<path d="${path} Z" fill="rgba(56, 97, 126, 0.44)" stroke="rgba(143, 240, 212, 0.18)" stroke-width="1.1"></path>`;
   })
   .join('');
+
+const buildRouteArcs = (origin, markers) => markers
+  .map((marker) => {
+    const midX = (origin.x + marker.x) / 2;
+    const midY = (origin.y + marker.y) / 2;
+    const lift = -Math.min(70, Math.hypot(origin.x - marker.x, origin.y - marker.y) * 0.16);
+    const controlX = midX;
+    const controlY = midY + lift;
+
+    return `<path d="M ${origin.x.toFixed(2)} ${origin.y.toFixed(2)} Q ${controlX.toFixed(2)} ${controlY.toFixed(2)} ${marker.x.toFixed(2)} ${marker.y.toFixed(2)}" fill="none" stroke="url(#mapRoute)" stroke-opacity="0.45" stroke-width="1.2"></path>`;
+  })
+  .join('');
+
+const buildMapLabels = (width, height) => `
+  <text x="16" y="20" fill="rgba(151,170,195,0.72)" font-size="10">180W</text>
+  <text x="${(width / 2 - 12).toFixed(2)}" y="20" fill="rgba(151,170,195,0.72)" font-size="10">0</text>
+  <text x="${(width - 38).toFixed(2)}" y="20" fill="rgba(151,170,195,0.72)" font-size="10">180E</text>
+  <text x="${(width - 42).toFixed(2)}" y="${(height - 12).toFixed(2)}" fill="rgba(151,170,195,0.72)" font-size="10">Lat/Lon</text>
+`;
 
 const projectWorldPoint = (lon, lat, width, height, pad) => {
   const x = ((lon + 180) / 360) * (width - (pad * 2)) + pad;
