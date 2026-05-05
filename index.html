@@ -44,6 +44,11 @@
           document.documentElement.setAttribute('data-js-state', 'error');
         }
       });
+
+      (function () {
+        const versionSeed = Number(new Date(document.lastModified)) || Date.now();
+        window.__assetVersion = encodeURIComponent(String(versionSeed));
+      })();
     </script>
     <title>Sean | N7SIX</title>
     <meta
@@ -51,7 +56,19 @@
       content="Sean, callsign N7SIX, is a licensed amateur radio operator in the Philippines with interests in radio and the UV-K series firmware community."
     />
     <link rel="icon" type="image/jpeg" href="profile_photo/672666629_4325556954379791_5059292050618915307_n.jpg" />
-    <link rel="stylesheet" href="styles.css?v=ce8847b" />
+    <link rel="stylesheet" href="styles.css" data-app-style />
+    <script>
+      (function () {
+        const styleNode = document.querySelector('link[data-app-style]');
+
+        if (!styleNode) {
+          return;
+        }
+
+        const version = window.__assetVersion || encodeURIComponent(String(Date.now()));
+        styleNode.href = `styles.css?v=${version}`;
+      })();
+    </script>
   </head>
   <body>
     <div class="identity-blend" aria-hidden="true">
@@ -385,8 +402,22 @@
     <noscript>
       <p class="runtime-status runtime-status-noscript">Runtime: JavaScript is disabled. Interactive content and monitoring are unavailable.</p>
     </noscript>
-    <script src="usage-tracker-config.js?v=ce8847b"></script>
-    <script src="usage-monitoring.js?v=ce8847b"></script>
-    <script src="script.js?v=ce8847b"></script>
+    <script>
+      (async function () {
+        const version = window.__assetVersion || encodeURIComponent(String(Date.now()));
+        const scripts = ['usage-tracker-config.js', 'usage-monitoring.js', 'script.js'];
+
+        for (const source of scripts) {
+          await new Promise((resolve) => {
+            const scriptNode = document.createElement('script');
+            scriptNode.src = `${source}?v=${version}`;
+            scriptNode.async = false;
+            scriptNode.onload = resolve;
+            scriptNode.onerror = resolve;
+            document.body.appendChild(scriptNode);
+          });
+        }
+      })();
+    </script>
   </body>
 </html>
