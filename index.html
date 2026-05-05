@@ -50,12 +50,6 @@
         window.__assetVersion = encodeURIComponent(String(Date.now()));
       })();
 
-      window.__hamclockVersion = {
-        majorMinor: '7.6',
-        seedSerial: 1,
-        buildIndex: 2,
-        increment: 76,
-      };
     </script>
     <title>Sean | N7SIX</title>
     <meta
@@ -94,7 +88,6 @@
         </a>
 
         <nav class="nav" aria-label="Primary navigation">
-          <a href="#hamclock">HamClock</a>
           <a href="#profile">Profile</a>
           <a href="#radio">Radio</a>
           <a href="#social">Social</a>
@@ -192,147 +185,6 @@
                 <span id="usage-world-map-caption">Plotted countries: --</span>
               </div>
               <svg id="usage-world-map" viewBox="0 0 860 360" role="img" aria-label="World map with visitor country markers"></svg>
-            </div>
-          </div>
-        </section>
-
-        <section id="hamclock" class="section hamclock-section" aria-label="Personalized ham clock dashboard">
-          <div class="hamclock-shell interactive-card">
-            <div class="hamclock-head">
-              <div>
-                <p class="section-label">Operator Console</p>
-                <h2>N7SIX HamClock</h2>
-              </div>
-              <p class="hamclock-note">Live operating references tuned for Sean in the Philippines.</p>
-            </div>
-
-            <div class="hamclock-grid">
-              <p class="hamclock-group-title">Status</p>
-              <article class="hamclock-card hamclock-card-compact">
-                <p class="hamclock-label">UTC Time</p>
-                <p id="hc-utc-time" class="hamclock-value">--:--:--</p>
-                <p id="hc-day-info" class="hamclock-sub">DOY -- | Week --</p>
-              </article>
-
-              <article class="hamclock-card hamclock-card-compact">
-                <p class="hamclock-label">Local Time</p>
-                <p id="hc-local-time" class="hamclock-value">--:--:--</p>
-                <p id="hc-local-zone" class="hamclock-sub">Asia/Manila</p>
-              </article>
-
-              <article class="hamclock-card hamclock-card-compact">
-                <p class="hamclock-label">Station Locator</p>
-                <p id="hc-grid" class="hamclock-value">--</p>
-                <p class="hamclock-sub">QTH: Metro Manila</p>
-              </article>
-
-              <article class="hamclock-card hamclock-card-compact">
-                <p class="hamclock-label">Moon Phase</p>
-                <p id="hc-moon-phase" class="hamclock-value">--</p>
-                <p class="hamclock-sub">For night-sky operating context</p>
-              </article>
-
-              <article class="hamclock-card hamclock-card-wide hamclock-map-card">
-                <div class="hamclock-dx-head">
-                  <p class="hamclock-label">Propagation World View</p>
-                  <span id="hc-map-caption" class="hamclock-sub">Day/Night: --</span>
-                </div>
-                <div class="hamclock-map-tools">
-                  <span id="hc-map-mode" class="hamclock-tool-pill">Flat / Dark</span>
-                  <span id="hc-map-utc" class="hamclock-tool-pill">UTC --:--</span>
-                </div>
-                <div class="hamclock-map-layout">
-                  <svg id="hc-world-map" viewBox="0 0 960 420" role="img" aria-label="ISS-style world map with day and night regions"></svg>
-                </div>
-                <aside class="hamclock-cluster hamclock-cluster-below" aria-label="DX cluster panel">
-                  <div class="hamclock-cluster-head">
-                    <strong>DX Cluster Live</strong>
-                    <span id="hc-cluster-count">0 spots</span>
-                  </div>
-                  <ul id="hc-cluster-list" class="hamclock-cluster-list"></ul>
-                </aside>
-                <div class="hamclock-band-chips" aria-label="Band legend">
-                  <span class="hamclock-chip hamclock-chip-20m">20m</span>
-                  <span class="hamclock-chip hamclock-chip-17m">17m</span>
-                  <span class="hamclock-chip hamclock-chip-15m">15m</span>
-                  <span class="hamclock-chip hamclock-chip-40m">40m</span>
-                </div>
-              </article>
-
-              <p class="hamclock-group-title">Operating Geometry</p>
-              <article class="hamclock-card hamclock-panel-card">
-                <p class="hamclock-label">Solar Window</p>
-                <div class="hamclock-sun-grid">
-                  <p id="hc-sunrise" class="hamclock-sub">Sunrise: --</p>
-                  <p id="hc-sunset" class="hamclock-sub">Sunset: --</p>
-                </div>
-                <p id="hc-solar-window" class="hamclock-sub">Daylight window: --</p>
-                <svg id="hc-daylight-arc" viewBox="0 0 320 120" role="img" aria-label="Sunrise and sunset daylight arc"></svg>
-              </article>
-
-              <article class="hamclock-card hamclock-panel-card hamclock-ops-card">
-                <p class="hamclock-label">Band Focus</p>
-                <p id="hc-band-now" class="hamclock-sub">Now: --</p>
-                <p id="hc-band-next" class="hamclock-sub">Next: --</p>
-                <div id="hc-band-meter" class="hamclock-band-meter" aria-label="Band activity meter"></div>
-              </article>
-
-              <article class="hamclock-card hamclock-panel-card hamclock-ops-card">
-                <div class="hamclock-dx-head">
-                  <p class="hamclock-label">DX Heading</p>
-                  <select id="hc-target-select" class="hamclock-select" aria-label="DX target selector">
-                    <option value="tokyo">Tokyo</option>
-                    <option value="singapore">Singapore</option>
-                    <option value="london">London</option>
-                    <option value="california">California</option>
-                  </select>
-                </div>
-                <p id="hc-dx-target" class="hamclock-sub">Target: --</p>
-                <p id="hc-dx-bearing" class="hamclock-sub">Bearing: --</p>
-                <p id="hc-dx-distance" class="hamclock-sub">Distance: --</p>
-                <svg id="hc-compass" viewBox="0 0 220 220" role="img" aria-label="DX compass bearing visualization"></svg>
-              </article>
-
-              <p class="hamclock-group-title">Network Telemetry</p>
-              <article class="hamclock-card hamclock-telemetry-card">
-                <p class="hamclock-label">Solar Indices</p>
-                <ul class="hamclock-telemetry-list">
-                  <li><span>SFI</span><strong id="hc-sfi">--</strong></li>
-                  <li><span>K-index</span><strong id="hc-kindex">--</strong></li>
-                  <li><span>Sunspots</span><strong id="hc-ssn">--</strong></li>
-                  <li><span>Aurora</span><strong id="hc-aurora">--</strong></li>
-                </ul>
-              </article>
-
-              <article class="hamclock-card hamclock-telemetry-card">
-                <p class="hamclock-label">Decode Networks</p>
-                <ul class="hamclock-telemetry-list">
-                  <li><span>PSKReporter</span><strong id="hc-psk">--</strong></li>
-                  <li><span>RBN</span><strong id="hc-rbn">--</strong></li>
-                  <li><span>WSJT-X</span><strong id="hc-wsjtx">--</strong></li>
-                  <li><span>Cluster Rate</span><strong id="hc-cluster-rate">--</strong></li>
-                </ul>
-              </article>
-
-              <article class="hamclock-card hamclock-telemetry-card">
-                <p class="hamclock-label">Activator Watch</p>
-                <ul class="hamclock-telemetry-list">
-                  <li><span>POTA Spots</span><strong id="hc-pota">--</strong></li>
-                  <li><span>SOTA Spots</span><strong id="hc-sota">--</strong></li>
-                  <li><span>WWFF Spots</span><strong id="hc-wwff">--</strong></li>
-                  <li><span>IOTA Alerts</span><strong id="hc-iota">--</strong></li>
-                </ul>
-              </article>
-
-              <article class="hamclock-card hamclock-telemetry-card">
-                <p class="hamclock-label">Satellite Pass</p>
-                <ul class="hamclock-telemetry-list">
-                  <li><span>Bird</span><strong id="hc-sat-name">--</strong></li>
-                  <li><span>AOS (local)</span><strong id="hc-sat-aos">--</strong></li>
-                  <li><span>LOS (local)</span><strong id="hc-sat-los">--</strong></li>
-                  <li><span>Max Elevation</span><strong id="hc-sat-elev">--</strong></li>
-                </ul>
-              </article>
             </div>
           </div>
         </section>
@@ -448,38 +300,10 @@
 
     <div class="ambient ambient-one" aria-hidden="true"></div>
     <div class="ambient ambient-two" aria-hidden="true"></div>
-    <div id="hamclock-version-stamp" class="hamclock-version-stamp" aria-live="polite">
-      <p id="hamclock-version-text">--</p>
-      <p id="hamclock-copyright-text">Copyright © 2026 N7SIX. All rights reserved.</p>
-    </div>
     <p id="runtime-status" class="runtime-status" aria-live="polite">Runtime: initializing scripts...</p>
     <noscript>
       <p class="runtime-status runtime-status-noscript">Runtime: JavaScript is disabled. Interactive content and monitoring are unavailable.</p>
     </noscript>
-    <script>
-      (function () {
-        const versionTextNode = document.getElementById('hamclock-version-text');
-        const copyrightNode = document.getElementById('hamclock-copyright-text');
-        const cfg = window.__hamclockVersion || {};
-        const majorMinor = String(cfg.majorMinor || '7.6');
-        const seedSerial = Number(cfg.seedSerial);
-        const buildIndex = Number(cfg.buildIndex);
-        const increment = Number(cfg.increment);
-        const safeSeed = Number.isFinite(seedSerial) ? Math.max(0, Math.floor(seedSerial)) : 1;
-        const safeIndex = Number.isFinite(buildIndex) ? Math.max(0, Math.floor(buildIndex)) : 1;
-        const safeIncrement = Number.isFinite(increment) ? Math.max(0, Math.floor(increment)) : 76;
-        const safeSerial = safeSeed + (safeIndex * safeIncrement);
-        const paddedSerial = String(safeSerial).padStart(5, '0');
-
-        if (versionTextNode) {
-          versionTextNode.textContent = `v${majorMinor}.${paddedSerial}`;
-        }
-
-        if (copyrightNode) {
-          copyrightNode.textContent = `Copyright © ${new Date().getFullYear()} N7SIX. All rights reserved.`;
-        }
-      })();
-    </script>
     <script>
       (async function () {
         const version = window.__assetVersion || encodeURIComponent(String(Date.now()));
