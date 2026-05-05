@@ -532,7 +532,7 @@ const buildDayNightOverlay = (width, height, pad) => {
 
   return `
     <defs>
-const wmGetSolarSubpoint = (date) => {
+      <radialGradient id="mapDaylight" gradientUnits="userSpaceOnUse" cx="${center.x.toFixed(2)}" cy="${center.y.toFixed(2)}" r="${twilightRadius.toFixed(2)}">
         <stop offset="0%" stop-color="rgba(0,0,0,0.00)"></stop>
         <stop offset="44%" stop-color="rgba(0,0,0,0.08)"></stop>
         <stop offset="76%" stop-color="rgba(0,0,0,0.52)"></stop>
@@ -546,7 +546,7 @@ const wmGetSolarSubpoint = (date) => {
   `;
 };
 
-const getSolarSubpoint = (date) => {
+const wmGetSolarSubpoint = (date) => {
   const startOfYear = Date.UTC(date.getUTCFullYear(), 0, 0);
   const dayOfYear = Math.floor((date.getTime() - startOfYear) / 86400000);
   const utcHours = date.getUTCHours() + (date.getUTCMinutes() / 60) + (date.getUTCSeconds() / 3600);
