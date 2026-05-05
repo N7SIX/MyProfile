@@ -524,7 +524,7 @@ const buildMapLabels = (width, height) => `
 
 const buildDayNightOverlay = (width, height, pad) => {
   const now = new Date();
-  const subsolar = getSolarSubpoint(now);
+  const subsolar = wmGetSolarSubpoint(now);
   const center = projectWorldPoint(subsolar.lon, subsolar.lat, width, height, pad);
   const twilightRadius = Math.max(width, height) * 0.48;
   const terminatorPath = buildTerminatorPath(subsolar.lon, subsolar.lat, width, height, pad);
@@ -532,7 +532,7 @@ const buildDayNightOverlay = (width, height, pad) => {
 
   return `
     <defs>
-      <radialGradient id="mapDaylight" gradientUnits="userSpaceOnUse" cx="${center.x.toFixed(2)}" cy="${center.y.toFixed(2)}" r="${twilightRadius.toFixed(2)}">
+const wmGetSolarSubpoint = (date) => {
         <stop offset="0%" stop-color="rgba(0,0,0,0.00)"></stop>
         <stop offset="44%" stop-color="rgba(0,0,0,0.08)"></stop>
         <stop offset="76%" stop-color="rgba(0,0,0,0.52)"></stop>
