@@ -56,8 +56,20 @@
       name="description"
       content="Sean, callsign N7SIX, is a licensed amateur radio operator in the Philippines with interests in radio and the UV-K series firmware community."
     />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin="anonymous"
+    />
     <link rel="icon" type="image/jpeg" href="profile_photo/672666629_4325556954379791_5059292050618915307_n.jpg" />
     <link rel="stylesheet" href="styles.css" data-app-style />
+    <script
+      defer
+      src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+      crossorigin="anonymous"
+    ></script>
     <script>
       (function () {
         const styleNode = document.querySelector('link[data-app-style]');
@@ -184,7 +196,7 @@
                 <strong>World Visitor Map</strong>
                 <span id="usage-world-map-caption">Plotted countries: --</span>
               </div>
-              <svg id="usage-world-map" viewBox="0 0 860 360" role="img" aria-label="World map with visitor country markers"></svg>
+              <div id="usage-world-map" role="img" aria-label="World map with visitor country markers and country labels"></div>
             </div>
           </div>
         </section>

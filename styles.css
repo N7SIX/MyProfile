@@ -547,45 +547,47 @@ h3 {
 #usage-world-map {
   display: block;
   width: 100%;
-  height: auto;
+  height: 360px;
   margin-top: 10px;
   border-radius: 10px;
   border: 1px solid rgba(148, 178, 213, 0.18);
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.24);
+  overflow: hidden;
 }
 
-#usage-world-map .map-marker-pulse {
-  transform-origin: center;
-  animation: mapPulse 2.8s ease-out infinite;
+.usage-map-status {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 0.8rem;
 }
 
-#usage-world-map .map-route-arc {
-  stroke-dasharray: 6 8;
-  animation: mapRouteFlow 4.8s linear infinite;
+.leaflet-container {
+  background: rgba(7, 20, 36, 0.55);
+  font-family: "IBM Plex Sans", sans-serif;
 }
 
-@keyframes mapPulse {
-  0% {
-    opacity: 0.55;
-    transform: scale(0.75);
-  }
-  70% {
-    opacity: 0;
-    transform: scale(1.65);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1.65);
-  }
+.leaflet-control-attribution {
+  background: rgba(7, 20, 36, 0.72) !important;
+  color: rgba(236, 244, 255, 0.82) !important;
 }
 
-@keyframes mapRouteFlow {
-  from {
-    stroke-dashoffset: 0;
-  }
-  to {
-    stroke-dashoffset: -56;
-  }
+.leaflet-control-attribution a {
+  color: rgba(143, 240, 212, 0.92) !important;
+}
+
+.usage-map-tooltip {
+  background: rgba(7, 20, 36, 0.9);
+  border: 1px solid rgba(148, 178, 213, 0.32);
+  color: rgba(236, 244, 255, 0.94);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.usage-map-tooltip:before {
+  border-top-color: rgba(7, 20, 36, 0.9) !important;
+}
+
+.usage-map-tooltip-station {
+  color: rgba(246, 199, 153, 0.98);
 }
 
 .country-row {
@@ -1087,6 +1089,10 @@ html[data-js-state="error"] .runtime-status {
 
   .usage-shell {
     padding: 20px;
+  }
+
+  #usage-world-map {
+    height: 260px;
   }
 
   .section {

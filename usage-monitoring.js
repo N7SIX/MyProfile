@@ -8,6 +8,9 @@ const usageCountriesTotalNode = document.getElementById('usage-countries-total')
 const usageCountriesListNode = document.getElementById('usage-countries-list');
 const usageWorldMapNode = document.getElementById('usage-world-map');
 const usageWorldMapCaptionNode = document.getElementById('usage-world-map-caption');
+let usageLeafletMap = null;
+let usageLeafletLayerGroup = null;
+let usageMapRetryTimerId = 0;
 
 const DEFAULT_USAGE_TRACKER = {
   eventEndpoint: 'https://your-worker-subdomain.workers.dev/event',
@@ -107,52 +110,6 @@ const COUNTRY_CENTROIDS = {
   US: { lat: 37.09, lon: -95.71 },
   VN: { lat: 14.06, lon: 108.28 },
 };
-
-const WORLD_LANDMASSES = [
-  // North America
-  [
-    [-168, 72], [-145, 72], [-128, 66], [-110, 58], [-96, 50], [-82, 44],
-    [-78, 34], [-88, 24], [-102, 18], [-112, 25], [-120, 32], [-132, 42],
-    [-145, 52], [-160, 60],
-  ],
-  // South America
-  [
-    [-81, 12], [-72, 8], [-66, -4], [-64, -18], [-60, -30], [-54, -42],
-    [-48, -53], [-39, -48], [-35, -34], [-36, -20], [-45, -8], [-58, 2],
-    [-70, 9],
-  ],
-  // Europe + Asia (Eurasia)
-  [
-    [-10, 36], [0, 44], [16, 52], [30, 58], [46, 64], [66, 66], [86, 61],
-    [104, 56], [120, 48], [132, 42], [142, 51], [156, 62], [172, 58],
-    [166, 44], [152, 34], [132, 24], [110, 20], [92, 14], [74, 12],
-    [56, 18], [44, 26], [32, 36], [20, 42], [8, 44], [-2, 40],
-  ],
-  // Africa
-  [
-    [-16, 35], [-4, 37], [12, 35], [24, 28], [33, 16], [40, 4], [42, -12],
-    [36, -28], [24, -34], [12, -35], [2, -24], [-6, -6], [-12, 10],
-  ],
-  // Arabian Peninsula
-  [
-    [34, 32], [44, 30], [52, 24], [54, 16], [50, 12], [44, 13], [40, 18],
-    [36, 25],
-  ],
-  // Southeast Asia islands
-  [
-    [96, 18], [106, 18], [116, 12], [124, 6], [128, -2], [122, -8],
-    [112, -6], [102, 0], [96, 8],
-  ],
-  // Australia
-  [
-    [112, -12], [122, -18], [134, -20], [146, -24], [152, -34], [146, -42],
-    [132, -43], [120, -38], [112, -28],
-  ],
-  // Greenland
-  [
-    [-58, 82], [-42, 80], [-30, 74], [-34, 64], [-46, 60], [-56, 66],
-  ],
-];
 
 const WORLD_MAP_STATION = {
   code: 'PH',
@@ -387,9 +344,28 @@ const renderWorldMap = (countries, message) => {
     return;
   }
 
-  const width = 860;
-  const height = 360;
-  const pad = 18;
+  if (!ensureLeafletMap()) {
+    usageWorldMapNode.innerHTML = '<p class="usage-map-status">Map base is loading. Please wait...</p>';
+    if (usageWorldMapCaptionNode) {
+      usageWorldMapCaptionNode.textContent = 'Plotted countries: --';
+    }
+
+    if (!usageMapRetryTimerId) {
+      usageMapRetryTimerId = window.setTimeout(() => {
+        usageMapRetryTimerId = 0;
+        renderWorldMap(countries, message);
+      }, 1200);
+    }
+
+    return;
+  }
+
+  if (!usageLeafletLayerGroup) {
+    return;
+  }
+
+  usageLeafletLayerGroup.clearLayers();
+
   const maxCount = Math.max(...countries.map((item) => Number(item.count || 0)), 1);
   const markerEntries = countries
     .map((item) => {
@@ -400,7 +376,6 @@ const renderWorldMap = (countries, message) => {
         return null;
       }
 
-      const projected = projectWorldPoint(centroid.lon, centroid.lat, width, height, pad);
       const count = Number(item.count || 0);
       const radius = 4 + ((count / maxCount) * 7);
 
@@ -408,216 +383,98 @@ const renderWorldMap = (countries, message) => {
         code,
         label: formatCountryLabel(code),
         count,
-        x: projected.x,
-        y: projected.y,
+        lat: centroid.lat,
+        lon: centroid.lon,
         radius,
       };
     })
     .filter(Boolean);
 
-  const station = projectWorldPoint(WORLD_MAP_STATION.lon, WORLD_MAP_STATION.lat, width, height, pad);
+  const L = window.L;
+  const stationLatLng = [WORLD_MAP_STATION.lat, WORLD_MAP_STATION.lon];
 
-  const markerSvg = markerEntries
-    .map((entry, index) => `
-      <g>
-        <circle class="map-marker-pulse" style="animation-delay: ${(index * 180)}ms" cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${(entry.radius + 5).toFixed(2)}" fill="rgba(143,240,212,0.12)"></circle>
-        <circle cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${entry.radius.toFixed(2)}" fill="rgba(143,240,212,0.9)" stroke="rgba(8,28,49,0.92)" stroke-width="1.3"></circle>
-        <text x="${(entry.x + 9).toFixed(2)}" y="${(entry.y - 9).toFixed(2)}" fill="rgba(236,244,255,0.94)" font-size="10" font-family="'Hyundai Sans Head', sans-serif">${escapeHtml(entry.code)}</text>
-      </g>
-    `)
-    .join('');
+  L.circleMarker(stationLatLng, {
+    radius: 7,
+    color: 'rgba(8,24,42,0.95)',
+    weight: 1.5,
+    fillColor: 'rgba(246,168,95,0.95)',
+    fillOpacity: 0.95,
+  })
+    .bindTooltip('N7SIX QTH', {
+      permanent: true,
+      direction: 'top',
+      offset: [0, -8],
+      className: 'usage-map-tooltip usage-map-tooltip-station',
+    })
+    .addTo(usageLeafletLayerGroup);
 
-  const routeArcs = buildRouteArcs(station, markerEntries);
-  const terminatorOverlay = buildDayNightOverlay(width, height, pad);
+  markerEntries.forEach((entry) => {
+    const markerLatLng = [entry.lat, entry.lon];
 
-  const stationMarkup = `
-    <g>
-      <circle cx="${station.x.toFixed(2)}" cy="${station.y.toFixed(2)}" r="11" fill="rgba(246,168,95,0.18)"></circle>
-      <circle cx="${station.x.toFixed(2)}" cy="${station.y.toFixed(2)}" r="5.6" fill="rgba(246,168,95,0.95)" stroke="rgba(8,24,42,0.95)" stroke-width="1.2"></circle>
-      <text x="${(station.x + 11).toFixed(2)}" y="${(station.y - 10).toFixed(2)}" fill="rgba(246,199,153,0.95)" font-size="10" font-family="'Hyundai Sans Head', sans-serif">N7SIX</text>
-    </g>
-  `;
+    L.polyline([stationLatLng, markerLatLng], {
+      color: 'rgba(143,240,212,0.38)',
+      weight: 1.2,
+      opacity: 0.75,
+      dashArray: '4 6',
+    }).addTo(usageLeafletLayerGroup);
 
-  usageWorldMapNode.innerHTML = `
-    <defs>
-      <linearGradient id="mapBg" x1="0" x2="1" y1="0" y2="1">
-        <stop offset="0%" stop-color="rgba(10,35,63,0.95)"></stop>
-        <stop offset="100%" stop-color="rgba(6,18,34,0.98)"></stop>
-      </linearGradient>
-      <radialGradient id="mapGlow" cx="50%" cy="50%" r="70%">
-        <stop offset="0%" stop-color="rgba(64,210,164,0.16)"></stop>
-        <stop offset="100%" stop-color="rgba(64,210,164,0.02)"></stop>
-      </radialGradient>
-      <linearGradient id="mapRoute" x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0%" stop-color="rgba(246,168,95,0.55)"></stop>
-        <stop offset="100%" stop-color="rgba(143,240,212,0.72)"></stop>
-      </linearGradient>
-    </defs>
-    <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapBg)"></rect>
-    <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapGlow)"></rect>
-    ${terminatorOverlay}
-    ${buildLandmassPaths(width, height, pad)}
-    ${buildMapGrid(width, height, pad)}
-    ${routeArcs}
-    ${stationMarkup}
-    ${markerSvg}
-    ${buildMapLabels(width, height)}
-    ${message ? `<text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" fill="rgba(151,170,195,0.95)" font-size="14">${escapeHtml(message)}</text>` : ''}
-  `;
+    L.circleMarker(markerLatLng, {
+      radius: entry.radius,
+      color: 'rgba(8,28,49,0.92)',
+      weight: 1.2,
+      fillColor: 'rgba(143,240,212,0.9)',
+      fillOpacity: 0.9,
+    })
+      .bindTooltip(`${entry.label} (${entry.count.toLocaleString()})`, {
+        direction: 'top',
+        offset: [0, -6],
+        className: 'usage-map-tooltip',
+      })
+      .addTo(usageLeafletLayerGroup);
+  });
 
   if (usageWorldMapCaptionNode) {
-    usageWorldMapCaptionNode.textContent = markerEntries.length
-      ? `Plotted countries: ${markerEntries.length}`
-      : 'Plotted countries: --';
+    if (message) {
+      usageWorldMapCaptionNode.textContent = message;
+    } else {
+      usageWorldMapCaptionNode.textContent = markerEntries.length
+        ? `Plotted countries: ${markerEntries.length}`
+        : 'Plotted countries: --';
+    }
   }
 };
-
-const buildMapGrid = (width, height, pad) => {
-  const lines = [];
-
-  for (let lon = -150; lon <= 150; lon += 30) {
-    const start = projectWorldPoint(lon, -75, width, height, pad);
-    const end = projectWorldPoint(lon, 75, width, height, pad);
-    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.08)" stroke-width="1"></line>`);
+const ensureLeafletMap = () => {
+  if (!usageWorldMapNode || typeof window.L === 'undefined') {
+    return false;
   }
 
-  for (let lat = -60; lat <= 60; lat += 30) {
-    const start = projectWorldPoint(-180, lat, width, height, pad);
-    const end = projectWorldPoint(180, lat, width, height, pad);
-    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.08)" stroke-width="1"></line>`);
+  if (usageLeafletMap) {
+    return true;
   }
 
-  return lines.join('');
-};
+  const L = window.L;
+  usageLeafletMap = L.map(usageWorldMapNode, {
+    center: [18, 12],
+    zoom: 2,
+    minZoom: 2,
+    maxZoom: 6,
+    worldCopyJump: true,
+    zoomControl: true,
+    attributionControl: true,
+  });
 
-const buildLandmassPaths = (width, height, pad) => WORLD_LANDMASSES
-  .map((polygon) => {
-    const path = polygon
-      .map(([lon, lat], index) => {
-        const point = projectWorldPoint(lon, lat, width, height, pad);
-        return `${index === 0 ? 'M' : 'L'}${point.x.toFixed(2)},${point.y.toFixed(2)}`;
-      })
-      .join(' ');
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(usageLeafletMap);
 
-    return `<path d="${path} Z" fill="rgba(56, 97, 126, 0.44)" stroke="rgba(143, 240, 212, 0.18)" stroke-width="1.1"></path>`;
-  })
-  .join('');
+  usageLeafletLayerGroup = L.layerGroup().addTo(usageLeafletMap);
+  window.setTimeout(() => {
+    if (usageLeafletMap) {
+      usageLeafletMap.invalidateSize();
+    }
+  }, 0);
 
-const buildRouteArcs = (origin, markers) => markers
-  .map((marker) => {
-    const midX = (origin.x + marker.x) / 2;
-    const midY = (origin.y + marker.y) / 2;
-    const lift = -Math.min(70, Math.hypot(origin.x - marker.x, origin.y - marker.y) * 0.16);
-    const controlX = midX;
-    const controlY = midY + lift;
-
-    return `<path class="map-route-arc" d="M ${origin.x.toFixed(2)} ${origin.y.toFixed(2)} Q ${controlX.toFixed(2)} ${controlY.toFixed(2)} ${marker.x.toFixed(2)} ${marker.y.toFixed(2)}" fill="none" stroke="url(#mapRoute)" stroke-opacity="0.45" stroke-width="1.2"></path>`;
-  })
-  .join('');
-
-const buildMapLabels = (width, height) => `
-  <text x="16" y="20" fill="rgba(151,170,195,0.72)" font-size="10">180W</text>
-  <text x="${(width / 2 - 12).toFixed(2)}" y="20" fill="rgba(151,170,195,0.72)" font-size="10">0</text>
-  <text x="${(width - 38).toFixed(2)}" y="20" fill="rgba(151,170,195,0.72)" font-size="10">180E</text>
-  <text x="${(width - 42).toFixed(2)}" y="${(height - 12).toFixed(2)}" fill="rgba(151,170,195,0.72)" font-size="10">Lat/Lon</text>
-`;
-
-const buildDayNightOverlay = (width, height, pad) => {
-  const now = new Date();
-  const subsolar = wmGetSolarSubpoint(now);
-  const center = projectWorldPoint(subsolar.lon, subsolar.lat, width, height, pad);
-  const twilightRadius = Math.max(width, height) * 0.48;
-  const terminatorPath = buildTerminatorPath(subsolar.lon, subsolar.lat, width, height, pad);
-  const utcLabel = now.toISOString().slice(11, 16);
-
-  return `
-    <defs>
-      <radialGradient id="mapDaylight" gradientUnits="userSpaceOnUse" cx="${center.x.toFixed(2)}" cy="${center.y.toFixed(2)}" r="${twilightRadius.toFixed(2)}">
-        <stop offset="0%" stop-color="rgba(0,0,0,0.00)"></stop>
-        <stop offset="44%" stop-color="rgba(0,0,0,0.08)"></stop>
-        <stop offset="76%" stop-color="rgba(0,0,0,0.52)"></stop>
-        <stop offset="100%" stop-color="rgba(0,0,0,0.74)"></stop>
-      </radialGradient>
-    </defs>
-    <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapDaylight)"></rect>
-    <path d="${terminatorPath}" fill="none" stroke="rgba(143,240,212,0.44)" stroke-width="1.2" stroke-dasharray="4 7"></path>
-    <circle cx="${center.x.toFixed(2)}" cy="${center.y.toFixed(2)}" r="4" fill="rgba(255,227,147,0.95)"></circle>
-    <text x="${(center.x + 8).toFixed(2)}" y="${(center.y - 10).toFixed(2)}" fill="rgba(255,227,147,0.95)" font-size="10">Sun ${utcLabel}Z</text>
-  `;
-};
-
-const wmGetSolarSubpoint = (date) => {
-  const startOfYear = Date.UTC(date.getUTCFullYear(), 0, 0);
-  const dayOfYear = Math.floor((date.getTime() - startOfYear) / 86400000);
-  const utcHours = date.getUTCHours() + (date.getUTCMinutes() / 60) + (date.getUTCSeconds() / 3600);
-  const gamma = (2 * Math.PI / 365) * ((dayOfYear - 1) + ((utcHours - 12) / 24));
-
-  const declinationRad =
-    0.006918
-    - (0.399912 * Math.cos(gamma))
-    + (0.070257 * Math.sin(gamma))
-    - (0.006758 * Math.cos(2 * gamma))
-    + (0.000907 * Math.sin(2 * gamma))
-    - (0.002697 * Math.cos(3 * gamma))
-    + (0.00148 * Math.sin(3 * gamma));
-
-  const equationOfTime = 229.18 * (
-    0.000075
-    + (0.001868 * Math.cos(gamma))
-    - (0.032077 * Math.sin(gamma))
-    - (0.014615 * Math.cos(2 * gamma))
-    - (0.040849 * Math.sin(2 * gamma))
-  );
-
-  const minutesUtc = (utcHours * 60);
-  const hourAngle = ((minutesUtc + equationOfTime) / 4) - 180;
-  const lon = wmNormalizeLongitude(-hourAngle);
-
-  return {
-    lat: wmToDegrees(declinationRad),
-    lon,
-  };
-};
-
-const buildTerminatorPath = (subsolarLon, subsolarLat, width, height, pad) => {
-  const points = [];
-  const declination = wmToRadians(subsolarLat);
-  const safeDeclination = Math.abs(Math.tan(declination)) < 1e-5
-    ? (declination >= 0 ? 1e-5 : -1e-5)
-    : declination;
-
-  for (let lon = -180; lon <= 180; lon += 4) {
-    const hourAngle = wmToRadians(lon - subsolarLon);
-    const lat = Math.atan(-Math.cos(hourAngle) / Math.tan(safeDeclination));
-    const projected = projectWorldPoint(lon, wmToDegrees(lat), width, height, pad);
-    points.push(`${points.length === 0 ? 'M' : 'L'}${projected.x.toFixed(2)},${projected.y.toFixed(2)}`);
-  }
-
-  return points.join(' ');
-};
-
-const wmToRadians = (value) => value * (Math.PI / 180);
-
-const wmToDegrees = (value) => value * (180 / Math.PI);
-
-const wmNormalizeLongitude = (value) => {
-  let lon = value;
-
-  while (lon > 180) {
-    lon -= 360;
-  }
-
-  while (lon < -180) {
-    lon += 360;
-  }
-
-  return lon;
-};
-
-const projectWorldPoint = (lon, lat, width, height, pad) => {
-  const x = ((lon + 180) / 360) * (width - (pad * 2)) + pad;
-  const y = ((90 - lat) / 180) * (height - (pad * 2)) + pad;
-  return { x, y };
+  return true;
 };
 
 const formatCountryLabel = (countryCode) => {
