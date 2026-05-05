@@ -693,6 +693,40 @@ h3 {
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.24);
 }
 
+#usage-world-map .map-marker-pulse {
+  transform-origin: center;
+  animation: mapPulse 2.8s ease-out infinite;
+}
+
+#usage-world-map .map-route-arc {
+  stroke-dasharray: 6 8;
+  animation: mapRouteFlow 4.8s linear infinite;
+}
+
+@keyframes mapPulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.75);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.65);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.65);
+  }
+}
+
+@keyframes mapRouteFlow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -56;
+  }
+}
+
 .country-row {
   display: grid;
   grid-template-columns: minmax(120px, 1.25fr) 1fr auto;

@@ -418,9 +418,9 @@ const renderWorldMap = (countries, message) => {
   const station = projectWorldPoint(WORLD_MAP_STATION.lon, WORLD_MAP_STATION.lat, width, height, pad);
 
   const markerSvg = markerEntries
-    .map((entry) => `
+    .map((entry, index) => `
       <g>
-        <circle cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${(entry.radius + 5).toFixed(2)}" fill="rgba(143,240,212,0.12)"></circle>
+        <circle class="map-marker-pulse" style="animation-delay: ${(index * 180)}ms" cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${(entry.radius + 5).toFixed(2)}" fill="rgba(143,240,212,0.12)"></circle>
         <circle cx="${entry.x.toFixed(2)}" cy="${entry.y.toFixed(2)}" r="${entry.radius.toFixed(2)}" fill="rgba(143,240,212,0.9)" stroke="rgba(8,28,49,0.92)" stroke-width="1.3"></circle>
         <text x="${(entry.x + 9).toFixed(2)}" y="${(entry.y - 9).toFixed(2)}" fill="rgba(236,244,255,0.94)" font-size="10" font-family="'Hyundai Sans Head', sans-serif">${escapeHtml(entry.code)}</text>
       </g>
@@ -428,6 +428,7 @@ const renderWorldMap = (countries, message) => {
     .join('');
 
   const routeArcs = buildRouteArcs(station, markerEntries);
+  const terminatorOverlay = buildDayNightOverlay(width, height, pad);
 
   const stationMarkup = `
     <g>
@@ -454,6 +455,7 @@ const renderWorldMap = (countries, message) => {
     </defs>
     <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapBg)"></rect>
     <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapGlow)"></rect>
+    ${terminatorOverlay}
     ${buildLandmassPaths(width, height, pad)}
     ${buildMapGrid(width, height, pad)}
     ${routeArcs}
@@ -509,7 +511,7 @@ const buildRouteArcs = (origin, markers) => markers
     const controlX = midX;
     const controlY = midY + lift;
 
-    return `<path d="M ${origin.x.toFixed(2)} ${origin.y.toFixed(2)} Q ${controlX.toFixed(2)} ${controlY.toFixed(2)} ${marker.x.toFixed(2)} ${marker.y.toFixed(2)}" fill="none" stroke="url(#mapRoute)" stroke-opacity="0.45" stroke-width="1.2"></path>`;
+    return `<path class="map-route-arc" d="M ${origin.x.toFixed(2)} ${origin.y.toFixed(2)} Q ${controlX.toFixed(2)} ${controlY.toFixed(2)} ${marker.x.toFixed(2)} ${marker.y.toFixed(2)}" fill="none" stroke="url(#mapRoute)" stroke-opacity="0.45" stroke-width="1.2"></path>`;
   })
   .join('');
 
@@ -519,6 +521,33 @@ const buildMapLabels = (width, height) => `
   <text x="${(width - 38).toFixed(2)}" y="20" fill="rgba(151,170,195,0.72)" font-size="10">180E</text>
   <text x="${(width - 42).toFixed(2)}" y="${(height - 12).toFixed(2)}" fill="rgba(151,170,195,0.72)" font-size="10">Lat/Lon</text>
 `;
+
+const buildDayNightOverlay = (width, height, pad) => {
+  const now = new Date();
+  const subsolarLongitude = getSolarSubpointLongitude(now);
+  const center = projectWorldPoint(subsolarLongitude, 0, width, height, pad);
+  const transition = Math.max(90, (width - (pad * 2)) * 0.19);
+  const left = Math.max(0, center.x - transition);
+  const right = Math.min(width, center.x + transition);
+
+  return `
+    <defs>
+      <linearGradient id="mapTerminator" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="rgba(0,0,0,0.52)"></stop>
+        <stop offset="${((left / width) * 100).toFixed(2)}%" stop-color="rgba(0,0,0,0.52)"></stop>
+        <stop offset="${((center.x / width) * 100).toFixed(2)}%" stop-color="rgba(0,0,0,0.07)"></stop>
+        <stop offset="${((right / width) * 100).toFixed(2)}%" stop-color="rgba(0,0,0,0.52)"></stop>
+        <stop offset="100%" stop-color="rgba(0,0,0,0.52)"></stop>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapTerminator)"></rect>
+  `;
+};
+
+const getSolarSubpointLongitude = (date) => {
+  const utcHours = date.getUTCHours() + (date.getUTCMinutes() / 60) + (date.getUTCSeconds() / 3600);
+  return 15 * (12 - utcHours);
+};
 
 const projectWorldPoint = (lon, lat, width, height, pad) => {
   const x = ((lon + 180) / 360) * (width - (pad * 2)) + pad;
