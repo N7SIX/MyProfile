@@ -56,6 +56,13 @@
         // Use a fresh token per page load to prevent stale JS/CSS after partial deploys.
         window.__assetVersion = encodeURIComponent(String(Date.now()));
       })();
+
+      window.__hamclockVersion = {
+        prefix: 'N7SIX HamClock',
+        majorMinor: '7.6',
+        serial: 1,
+        increment: 76,
+      };
     </script>
     <title>Sean | N7SIX</title>
     <meta
@@ -449,10 +456,34 @@
 
     <div class="ambient ambient-one" aria-hidden="true"></div>
     <div class="ambient ambient-two" aria-hidden="true"></div>
+    <div id="hamclock-version-stamp" class="hamclock-version-stamp" aria-live="polite">
+      <p id="hamclock-version-text">N7SIX HamClock v7.6.00001</p>
+      <p id="hamclock-copyright-text">Copyright © 2026 N7SIX. All rights reserved.</p>
+    </div>
     <p id="runtime-status" class="runtime-status" aria-live="polite">Runtime: initializing scripts...</p>
     <noscript>
       <p class="runtime-status runtime-status-noscript">Runtime: JavaScript is disabled. Interactive content and monitoring are unavailable.</p>
     </noscript>
+    <script>
+      (function () {
+        const versionTextNode = document.getElementById('hamclock-version-text');
+        const copyrightNode = document.getElementById('hamclock-copyright-text');
+        const cfg = window.__hamclockVersion || {};
+        const prefix = String(cfg.prefix || 'N7SIX HamClock');
+        const majorMinor = String(cfg.majorMinor || '7.6');
+        const serialNumber = Number(cfg.serial);
+        const safeSerial = Number.isFinite(serialNumber) ? Math.max(0, Math.floor(serialNumber)) : 1;
+        const paddedSerial = String(safeSerial).padStart(5, '0');
+
+        if (versionTextNode) {
+          versionTextNode.textContent = `${prefix} v${majorMinor}.${paddedSerial}`;
+        }
+
+        if (copyrightNode) {
+          copyrightNode.textContent = `Copyright © ${new Date().getFullYear()} N7SIX. All rights reserved.`;
+        }
+      })();
+    </script>
     <script>
       (async function () {
         const version = window.__assetVersion || encodeURIComponent(String(Date.now()));

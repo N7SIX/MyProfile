@@ -1307,7 +1307,7 @@ html.reveal-ready .reveal.is-visible {
 .runtime-status {
   position: fixed;
   right: 14px;
-  bottom: 12px;
+  bottom: 62px;
   z-index: 40;
   margin: 0;
   padding: 8px 10px;
@@ -1318,6 +1318,37 @@ html.reveal-ready .reveal.is-visible {
   font-size: 0.77rem;
   line-height: 1.4;
   max-width: min(92vw, 420px);
+}
+
+.hamclock-version-stamp {
+  position: fixed;
+  right: 14px;
+  bottom: 12px;
+  z-index: 39;
+  margin: 0;
+  padding: 7px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 178, 213, 0.24);
+  background: rgba(7, 20, 36, 0.86);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.24);
+  max-width: min(92vw, 460px);
+  line-height: 1.35;
+}
+
+.hamclock-version-stamp p {
+  margin: 0;
+}
+
+#hamclock-version-text {
+  color: rgba(236, 244, 255, 0.94);
+  font-family: "Hyundai Sans Head", sans-serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.03em;
+}
+
+#hamclock-copyright-text {
+  color: rgba(151, 170, 195, 0.9);
+  font-size: 0.69rem;
 }
 
 .runtime-status-noscript {
