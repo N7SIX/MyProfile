@@ -475,7 +475,6 @@ h3 {
 }
 
 .hamclock-map-card {
-  order: -1;
   grid-column: 1 / -1;
   padding: 16px;
 }
