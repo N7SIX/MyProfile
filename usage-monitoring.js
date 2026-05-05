@@ -34,9 +34,7 @@ const USAGE_TRACKER = {
 
 let lastCountValue = 0;
 
-const countryNameResolver = typeof Intl !== 'undefined' && typeof Intl.DisplayNames === 'function'
-  ? new Intl.DisplayNames(['en'], { type: 'region' })
-  : null;
+const countryNameResolver = createCountryNameResolver();
 
 const COUNTRY_NAME_FALLBACK = {
   AU: 'Australia',
@@ -67,6 +65,18 @@ const COUNTRY_NAME_FALLBACK = {
   US: 'United States',
   VN: 'Vietnam',
 };
+
+function createCountryNameResolver() {
+  if (typeof Intl === 'undefined' || typeof Intl.DisplayNames !== 'function') {
+    return null;
+  }
+
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'region' });
+  } catch {
+    return null;
+  }
+}
 
 const COUNTRY_CENTROIDS = {
   AU: { lat: -25.27, lon: 133.77 },
