@@ -50,12 +50,11 @@
         window.__assetVersion = encodeURIComponent(String(Date.now()));
       })();
 
-      // Bump only this value each release by +76 (00001, 00077, 00153, ...).
-      window.__hamclockBuildSerial = 77;
-
       window.__hamclockVersion = {
         majorMinor: '7.6',
-        serial: window.__hamclockBuildSerial,
+        seedSerial: 1,
+        buildIndex: 1,
+        increment: 76,
       };
     </script>
     <title>Sean | N7SIX</title>
@@ -464,8 +463,13 @@
         const copyrightNode = document.getElementById('hamclock-copyright-text');
         const cfg = window.__hamclockVersion || {};
         const majorMinor = String(cfg.majorMinor || '7.6');
-        const serialNumber = Number(cfg.serial);
-        const safeSerial = Number.isFinite(serialNumber) ? Math.max(0, Math.floor(serialNumber)) : 77;
+        const seedSerial = Number(cfg.seedSerial);
+        const buildIndex = Number(cfg.buildIndex);
+        const increment = Number(cfg.increment);
+        const safeSeed = Number.isFinite(seedSerial) ? Math.max(0, Math.floor(seedSerial)) : 1;
+        const safeIndex = Number.isFinite(buildIndex) ? Math.max(0, Math.floor(buildIndex)) : 1;
+        const safeIncrement = Number.isFinite(increment) ? Math.max(0, Math.floor(increment)) : 76;
+        const safeSerial = safeSeed + (safeIndex * safeIncrement);
         const paddedSerial = String(safeSerial).padStart(5, '0');
 
         if (versionTextNode) {
