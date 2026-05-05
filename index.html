@@ -22,6 +22,17 @@
         }
       };
 
+      window.setTimeout(function () {
+        if (document.documentElement.getAttribute('data-js-state') === 'booting') {
+          document.documentElement.setAttribute('data-js-state', 'ready');
+          const runtimeNode = document.getElementById('runtime-status');
+
+          if (runtimeNode) {
+            runtimeNode.textContent = 'Runtime: partial mode (monitoring is still loading).';
+          }
+        }
+      }, 5000);
+
       window.addEventListener('error', function () {
         if (document.documentElement.getAttribute('data-js-state') !== 'ready') {
           document.documentElement.setAttribute('data-js-state', 'error');
