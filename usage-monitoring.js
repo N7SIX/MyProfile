@@ -135,7 +135,7 @@ const trackUsageEvent = async (eventName, extra = {}) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        site: USAGE_TRACKER.site,
+        site: USAGE_TRACKER.trackingSite || USAGE_TRACKER.site,
         writeKey,
         event: eventName,
         path: window.location.pathname,
