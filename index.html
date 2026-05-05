@@ -57,10 +57,13 @@
         window.__assetVersion = encodeURIComponent(String(Date.now()));
       })();
 
+      // Bump only this value each release by +76 (00001, 00077, 00153, ...).
+      window.__hamclockBuildSerial = 1;
+
       window.__hamclockVersion = {
         prefix: 'N7SIX HamClock',
         majorMinor: '7.6',
-        serial: 1,
+        serial: window.__hamclockBuildSerial,
         increment: 76,
       };
     </script>
@@ -458,6 +461,7 @@
     <div class="ambient ambient-two" aria-hidden="true"></div>
     <div id="hamclock-version-stamp" class="hamclock-version-stamp" aria-live="polite">
       <p id="hamclock-version-text">N7SIX HamClock v7.6.00001</p>
+      <p id="hamclock-next-build-text">Next build: v7.6.00077 (+76)</p>
       <p id="hamclock-copyright-text">Copyright © 2026 N7SIX. All rights reserved.</p>
     </div>
     <p id="runtime-status" class="runtime-status" aria-live="polite">Runtime: initializing scripts...</p>
@@ -467,16 +471,25 @@
     <script>
       (function () {
         const versionTextNode = document.getElementById('hamclock-version-text');
+        const nextBuildTextNode = document.getElementById('hamclock-next-build-text');
         const copyrightNode = document.getElementById('hamclock-copyright-text');
         const cfg = window.__hamclockVersion || {};
         const prefix = String(cfg.prefix || 'N7SIX HamClock');
         const majorMinor = String(cfg.majorMinor || '7.6');
         const serialNumber = Number(cfg.serial);
+        const incrementNumber = Number(cfg.increment);
         const safeSerial = Number.isFinite(serialNumber) ? Math.max(0, Math.floor(serialNumber)) : 1;
+        const safeIncrement = Number.isFinite(incrementNumber) ? Math.max(0, Math.floor(incrementNumber)) : 76;
+        const nextSerial = safeSerial + safeIncrement;
         const paddedSerial = String(safeSerial).padStart(5, '0');
+        const paddedNextSerial = String(nextSerial).padStart(5, '0');
 
         if (versionTextNode) {
           versionTextNode.textContent = `${prefix} v${majorMinor}.${paddedSerial}`;
+        }
+
+        if (nextBuildTextNode) {
+          nextBuildTextNode.textContent = `Next build: v${majorMinor}.${paddedNextSerial} (+${safeIncrement})`;
         }
 
         if (copyrightNode) {
