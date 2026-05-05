@@ -472,13 +472,13 @@ h3 {
 }
 
 .hamclock-ops-card {
-  min-height: 184px;
+  min-height: 120px;
 }
 
 .hamclock-panel-card {
   grid-column: span 4;
-  padding: 11px;
-  min-height: 172px;
+  padding: 9px;
+  min-height: 105px;
 }
 
 .hamclock-map-card {
@@ -488,14 +488,14 @@ h3 {
 
 .hamclock-label {
   color: var(--muted);
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-family: "Hyundai Sans Head", sans-serif;
 }
 
 .hamclock-value {
-  margin-top: 8px;
+  margin-top: 4px;
   font-family: "Hyundai Sans Head", sans-serif;
   font-size: clamp(1.5rem, 3.2vw, 2.4rem);
   color: var(--accent-strong);
@@ -503,7 +503,7 @@ h3 {
 }
 
 .hamclock-sub {
-  margin-top: 6px;
+  margin-top: 3px;
   color: var(--muted);
   font-size: 0.87rem;
   line-height: 1.55;
@@ -512,14 +512,14 @@ h3 {
 .hamclock-sun-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 5px;
 }
 
 .hamclock-dx-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .hamclock-select {
@@ -537,10 +537,15 @@ h3 {
   display: block;
   width: 100%;
   height: auto;
-  margin-top: 10px;
+  margin-top: 6px;
   border-radius: 10px;
   border: 1px solid rgba(148, 178, 213, 0.18);
   background: rgba(7, 20, 36, 0.42);
+}
+
+#hc-daylight-arc,
+#hc-compass {
+  max-height: 90px;
 }
 
 #hc-world-map {
@@ -549,7 +554,7 @@ h3 {
 }
 
 .hamclock-map-tools {
-  margin-top: 10px;
+  margin-top: 6px;
   display: flex;
   justify-content: space-between;
   gap: 8px;
@@ -708,16 +713,16 @@ h3 {
 }
 
 .hamclock-band-meter {
-  margin-top: 10px;
+  margin-top: 6px;
   display: grid;
-  gap: 7px;
+  gap: 4px;
 }
 
 .hamclock-band-row {
   display: grid;
-  grid-template-columns: 36px 1fr;
+  grid-template-columns: 32px 1fr;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .hamclock-band-name {
