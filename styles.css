@@ -608,6 +608,10 @@ h3 {
   animation-play-state: paused;
 }
 
+.hamclock-shell:hover .hamclock-cluster-list {
+  animation-play-state: paused;
+}
+
 .hamclock-cluster-item {
   display: grid;
   grid-template-columns: auto auto 1fr auto;
