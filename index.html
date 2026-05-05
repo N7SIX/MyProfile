@@ -54,7 +54,6 @@
       window.__hamclockBuildSerial = 77;
 
       window.__hamclockVersion = {
-        prefix: 'N7SIX',
         majorMinor: '7.6',
         serial: window.__hamclockBuildSerial,
       };
@@ -452,7 +451,7 @@
     <div class="ambient ambient-one" aria-hidden="true"></div>
     <div class="ambient ambient-two" aria-hidden="true"></div>
     <div id="hamclock-version-stamp" class="hamclock-version-stamp" aria-live="polite">
-      <p id="hamclock-version-text">N7SIX v7.6.00077</p>
+      <p id="hamclock-version-text">v7.6.00077</p>
       <p id="hamclock-copyright-text">Copyright © 2026 N7SIX. All rights reserved.</p>
     </div>
     <p id="runtime-status" class="runtime-status" aria-live="polite">Runtime: initializing scripts...</p>
@@ -464,14 +463,13 @@
         const versionTextNode = document.getElementById('hamclock-version-text');
         const copyrightNode = document.getElementById('hamclock-copyright-text');
         const cfg = window.__hamclockVersion || {};
-        const prefix = String(cfg.prefix || 'N7SIX');
         const majorMinor = String(cfg.majorMinor || '7.6');
         const serialNumber = Number(cfg.serial);
         const safeSerial = Number.isFinite(serialNumber) ? Math.max(0, Math.floor(serialNumber)) : 77;
         const paddedSerial = String(safeSerial).padStart(5, '0');
 
         if (versionTextNode) {
-          versionTextNode.textContent = `${prefix} v${majorMinor}.${paddedSerial}`;
+          versionTextNode.textContent = `v${majorMinor}.${paddedSerial}`;
         }
 
         if (copyrightNode) {
