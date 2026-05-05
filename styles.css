@@ -600,7 +600,12 @@ h3 {
   display: grid;
   gap: 6px;
   max-height: 180px;
-  overflow: auto;
+  overflow: hidden;
+  animation: clusterScroll 20s linear infinite;
+}
+
+.hamclock-cluster-list:hover {
+  animation-play-state: paused;
 }
 
 .hamclock-cluster-item {
@@ -926,6 +931,15 @@ h3 {
   }
   to {
     stroke-dashoffset: -56;
+  }
+}
+
+@keyframes clusterScroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
   }
 }
 
