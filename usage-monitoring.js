@@ -365,6 +365,9 @@ const renderWorldMap = (countries, message) => {
   }
 
   usageLeafletLayerGroup.clearLayers();
+  const mapTime = new Date();
+  const subsolar = getSolarSubpoint(mapTime);
+  const nightPolygon = buildNightPolygon(subsolar.lon, subsolar.lat);
 
   const maxCount = Math.max(...countries.map((item) => Number(item.count || 0)), 1);
   const markerEntries = countries
@@ -392,6 +395,30 @@ const renderWorldMap = (countries, message) => {
 
   const L = window.L;
   const stationLatLng = [WORLD_MAP_STATION.lat, WORLD_MAP_STATION.lon];
+
+  L.polygon(nightPolygon, {
+    color: 'rgba(143,240,212,0.45)',
+    weight: 1,
+    dashArray: '6 8',
+    fillColor: 'rgba(5,12,24,0.52)',
+    fillOpacity: 0.52,
+    interactive: false,
+  }).addTo(usageLeafletLayerGroup);
+
+  L.circleMarker([subsolar.lat, subsolar.lon], {
+    radius: 4.5,
+    color: 'rgba(255,227,147,0.98)',
+    weight: 1.2,
+    fillColor: 'rgba(255,227,147,0.98)',
+    fillOpacity: 0.95,
+  })
+    .bindTooltip(`Sun ${mapTime.toISOString().slice(11, 16)}Z`, {
+      permanent: true,
+      direction: 'top',
+      offset: [0, -6],
+      className: 'usage-map-tooltip',
+    })
+    .addTo(usageLeafletLayerGroup);
 
   L.circleMarker(stationLatLng, {
     radius: 7,
@@ -437,8 +464,9 @@ const renderWorldMap = (countries, message) => {
     if (message) {
       usageWorldMapCaptionNode.textContent = message;
     } else {
+      const utcLabel = mapTime.toISOString().slice(11, 16);
       usageWorldMapCaptionNode.textContent = markerEntries.length
-        ? `Plotted countries: ${markerEntries.length}`
+        ? `Plotted countries: ${markerEntries.length} • Day/Night ${utcLabel}Z`
         : 'Plotted countries: --';
     }
   }
@@ -475,6 +503,84 @@ const ensureLeafletMap = () => {
   }, 0);
 
   return true;
+};
+
+const getSolarSubpoint = (date) => {
+  const startOfYear = Date.UTC(date.getUTCFullYear(), 0, 0);
+  const dayOfYear = Math.floor((date.getTime() - startOfYear) / 86400000);
+  const utcHours = date.getUTCHours() + (date.getUTCMinutes() / 60) + (date.getUTCSeconds() / 3600);
+  const gamma = (2 * Math.PI / 365) * ((dayOfYear - 1) + ((utcHours - 12) / 24));
+
+  const declinationRad =
+    0.006918
+    - (0.399912 * Math.cos(gamma))
+    + (0.070257 * Math.sin(gamma))
+    - (0.006758 * Math.cos(2 * gamma))
+    + (0.000907 * Math.sin(2 * gamma))
+    - (0.002697 * Math.cos(3 * gamma))
+    + (0.00148 * Math.sin(3 * gamma));
+
+  const equationOfTime = 229.18 * (
+    0.000075
+    + (0.001868 * Math.cos(gamma))
+    - (0.032077 * Math.sin(gamma))
+    - (0.014615 * Math.cos(2 * gamma))
+    - (0.040849 * Math.sin(2 * gamma))
+  );
+
+  const minutesUtc = utcHours * 60;
+  const hourAngle = ((minutesUtc + equationOfTime) / 4) - 180;
+
+  return {
+    lat: toDegrees(declinationRad),
+    lon: normalizeLongitude(-hourAngle),
+  };
+};
+
+const buildNightPolygon = (subsolarLon, subsolarLat) => {
+  const declination = toRadians(subsolarLat);
+  const safeDeclination = Math.abs(Math.tan(declination)) < 1e-5
+    ? (declination >= 0 ? 1e-5 : -1e-5)
+    : declination;
+  const terminatorPoints = [];
+
+  for (let lon = -180; lon <= 180; lon += 2) {
+    const hourAngle = toRadians(lon - subsolarLon);
+    const lat = Math.atan(-Math.cos(hourAngle) / Math.tan(safeDeclination));
+    terminatorPoints.push([toDegrees(lat), lon]);
+  }
+
+  if (subsolarLat >= 0) {
+    return [
+      [-90, -180],
+      ...terminatorPoints,
+      [-90, 180],
+    ];
+  }
+
+  return [
+    [90, -180],
+    ...terminatorPoints,
+    [90, 180],
+  ];
+};
+
+const toRadians = (value) => value * (Math.PI / 180);
+
+const toDegrees = (value) => value * (180 / Math.PI);
+
+const normalizeLongitude = (value) => {
+  let lon = value;
+
+  while (lon > 180) {
+    lon -= 360;
+  }
+
+  while (lon < -180) {
+    lon += 360;
+  }
+
+  return lon;
 };
 
 const formatCountryLabel = (countryCode) => {
