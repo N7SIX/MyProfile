@@ -498,6 +498,122 @@ h3 {
   min-height: 220px;
 }
 
+.hamclock-map-tools {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hamclock-tool-pill {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(148, 178, 213, 0.3);
+  border-radius: 999px;
+  padding: 4px 10px;
+  color: var(--muted);
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+  background: rgba(10, 29, 50, 0.72);
+}
+
+.hamclock-map-layout {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: 1.32fr 0.68fr;
+  gap: 10px;
+}
+
+.hamclock-cluster {
+  border: 1px solid rgba(148, 178, 213, 0.2);
+  border-radius: 10px;
+  background: rgba(8, 22, 39, 0.76);
+  padding: 10px;
+  min-height: 220px;
+}
+
+.hamclock-cluster-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.77rem;
+}
+
+.hamclock-cluster-head strong {
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+}
+
+.hamclock-cluster-list {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+  max-height: 208px;
+  overflow: auto;
+}
+
+.hamclock-cluster-item {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(148, 178, 213, 0.15);
+  border-radius: 8px;
+  padding: 5px 7px;
+  background: rgba(11, 32, 56, 0.62);
+}
+
+.hamclock-cluster-band {
+  font-size: 0.72rem;
+  color: var(--accent-strong);
+  font-family: "Hyundai Sans Head", sans-serif;
+}
+
+.hamclock-cluster-call {
+  color: var(--text);
+  font-size: 0.75rem;
+  font-family: "Hyundai Sans Head", sans-serif;
+}
+
+.hamclock-cluster-loc {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.hamclock-cluster-age {
+  color: rgba(151, 170, 195, 0.9);
+  font-size: 0.7rem;
+}
+
+.hamclock-band-chips {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hamclock-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px 9px;
+  font-size: 0.72rem;
+  font-family: "Hyundai Sans Head", sans-serif;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #061321;
+}
+
+.hamclock-chip-20m { background: #42d7b2; }
+.hamclock-chip-17m { background: #56c8ff; }
+.hamclock-chip-15m { background: #ffd36e; }
+.hamclock-chip-40m { background: #ff9c64; }
+
 .hamclock-band-meter {
   margin-top: 10px;
   display: grid;
@@ -1207,6 +1323,10 @@ html[data-js-state="error"] .runtime-status {
 
   .hamclock-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hamclock-map-layout {
+    grid-template-columns: 1fr;
   }
 
   .hero {

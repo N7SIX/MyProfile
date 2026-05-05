@@ -25,6 +25,10 @@ const hamClockNodes = {
   daylightArc: document.getElementById('hc-daylight-arc'),
   worldMap: document.getElementById('hc-world-map'),
   mapCaption: document.getElementById('hc-map-caption'),
+  mapUtc: document.getElementById('hc-map-utc'),
+  mapMode: document.getElementById('hc-map-mode'),
+  clusterList: document.getElementById('hc-cluster-list'),
+  clusterCount: document.getElementById('hc-cluster-count'),
 };
 
 const HAMCLOCK_WORLD_LANDMASSES = [
@@ -48,6 +52,19 @@ const DX_TARGETS = {
   london: { label: 'London, UK', lat: 51.5072, lon: -0.1276 },
   california: { label: 'California, US', lat: 36.7783, lon: -119.4179 },
 };
+
+const HAMCLOCK_DX_SPOTS = [
+  { call: 'JA1CQ', lat: 35.68, lon: 139.76, band: '20m', minutesAgo: 1 },
+  { call: 'W6EUH', lat: 34.05, lon: -118.24, band: '17m', minutesAgo: 2 },
+  { call: 'G3JAC', lat: 51.51, lon: -0.13, band: '20m', minutesAgo: 3 },
+  { call: 'VK2AM', lat: -33.87, lon: 151.21, band: '15m', minutesAgo: 4 },
+  { call: 'ZS6RN', lat: -26.20, lon: 28.04, band: '40m', minutesAgo: 5 },
+  { call: 'HL1WA', lat: 37.56, lon: 126.98, band: '17m', minutesAgo: 6 },
+  { call: 'K6RJM', lat: 37.77, lon: -122.42, band: '20m', minutesAgo: 7 },
+  { call: '9M2TD', lat: 3.14, lon: 101.69, band: '15m', minutesAgo: 8 },
+  { call: 'PY2ZX', lat: -23.55, lon: -46.63, band: '17m', minutesAgo: 9 },
+  { call: '4X1AB', lat: 32.09, lon: 34.78, band: '20m', minutesAgo: 10 },
+];
 
 document.documentElement.classList.add('reveal-ready');
 
@@ -735,6 +752,20 @@ function renderHamClockWorldMap() {
   const terminatorPath = buildMapTerminatorPath(subsolar.lon, subsolar.lat, width, height, pad);
   const routePath = buildGreatCirclePath(stationPoint, targetPoint);
   const utcLabel = now.toISOString().slice(11, 16);
+  const dxSpots = getVisibleDxSpots(targetKey, utcLabel);
+  const spotMarkup = dxSpots
+    .map((spot, index) => {
+      const spotPoint = projectMapPoint(spot.lon, spot.lat, width, height, pad);
+      const color = getBandColor(spot.band);
+      return `
+        <g>
+          <line x1="${stationPoint.x.toFixed(2)}" y1="${stationPoint.y.toFixed(2)}" x2="${spotPoint.x.toFixed(2)}" y2="${spotPoint.y.toFixed(2)}" stroke="${color}" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="3 5"></line>
+          <circle cx="${spotPoint.x.toFixed(2)}" cy="${spotPoint.y.toFixed(2)}" r="${(3.4 + (index % 2)).toFixed(2)}" fill="${color}" stroke="rgba(7,20,36,0.95)" stroke-width="1"></circle>
+          <text x="${(spotPoint.x + 7).toFixed(2)}" y="${(spotPoint.y - 6).toFixed(2)}" fill="rgba(236,244,255,0.94)" font-size="8.5">${escapeSvgText(spot.call)}</text>
+        </g>
+      `;
+    })
+    .join('');
 
   hamClockNodes.worldMap.innerHTML = `
     <defs>
@@ -759,6 +790,7 @@ function renderHamClockWorldMap() {
     ${buildHamClockGrid(width, height, pad)}
     <path d="${terminatorPath}" fill="none" stroke="rgba(143,240,212,0.5)" stroke-width="1.2" stroke-dasharray="4 6"></path>
     <path d="${routePath}" fill="none" stroke="url(#hcMapRoute)" stroke-width="1.6" stroke-dasharray="5 7"></path>
+    ${spotMarkup}
     <circle cx="${stationPoint.x.toFixed(2)}" cy="${stationPoint.y.toFixed(2)}" r="4.8" fill="rgba(246,168,95,0.95)"></circle>
     <text x="${(stationPoint.x + 8).toFixed(2)}" y="${(stationPoint.y - 8).toFixed(2)}" fill="rgba(246,199,153,0.95)" font-size="9">N7SIX</text>
     <circle cx="${targetPoint.x.toFixed(2)}" cy="${targetPoint.y.toFixed(2)}" r="4.4" fill="rgba(143,240,212,0.95)"></circle>
@@ -768,8 +800,99 @@ function renderHamClockWorldMap() {
   `;
 
   if (hamClockNodes.mapCaption) {
-    hamClockNodes.mapCaption.textContent = `Day/Night: ${utcLabel}Z`;
+    hamClockNodes.mapCaption.textContent = `Day/Night: ${utcLabel}Z · ${dxSpots.length} spots`;
   }
+
+  if (hamClockNodes.mapUtc) {
+    hamClockNodes.mapUtc.textContent = `UTC ${utcLabel}`;
+  }
+
+  if (hamClockNodes.mapMode) {
+    hamClockNodes.mapMode.textContent = 'Flat / Dark / Live';
+  }
+
+  renderDxCluster(dxSpots);
+}
+
+function renderDxCluster(spots) {
+  if (!hamClockNodes.clusterList) {
+    return;
+  }
+
+  hamClockNodes.clusterList.innerHTML = spots
+    .map((spot) => `
+      <li class="hamclock-cluster-item">
+        <span class="hamclock-cluster-band">${spot.band}</span>
+        <span class="hamclock-cluster-call">${spot.call}</span>
+        <span class="hamclock-cluster-loc">${spot.region}</span>
+        <span class="hamclock-cluster-age">${spot.minutesAgo}m</span>
+      </li>
+    `)
+    .join('');
+
+  if (hamClockNodes.clusterCount) {
+    hamClockNodes.clusterCount.textContent = `${spots.length} spots`;
+  }
+}
+
+function getVisibleDxSpots(targetKey, utcLabel) {
+  const rotation = Number.parseInt(utcLabel.slice(3, 5), 10) || 0;
+  const sorted = [...HAMCLOCK_DX_SPOTS]
+    .sort((a, b) => a.minutesAgo - b.minutesAgo)
+    .slice(rotation % 4, (rotation % 4) + 6);
+
+  const target = DX_TARGETS[targetKey] || DX_TARGETS.tokyo;
+
+  return sorted.map((spot) => ({
+    ...spot,
+    region: regionNameFromCoords(spot.lat, spot.lon),
+    minutesAgo: Math.max(1, spot.minutesAgo + (rotation % 5)),
+    minutesToTarget: haversineDistanceKm(spot.lat, spot.lon, target.lat, target.lon),
+  }));
+}
+
+function getBandColor(band) {
+  if (band === '20m') {
+    return 'rgba(66, 215, 178, 0.95)';
+  }
+
+  if (band === '17m') {
+    return 'rgba(86, 200, 255, 0.95)';
+  }
+
+  if (band === '15m') {
+    return 'rgba(255, 211, 110, 0.95)';
+  }
+
+  return 'rgba(255, 156, 100, 0.95)';
+}
+
+function regionNameFromCoords(lat, lon) {
+  if (lat > 20 && lon > 100) {
+    return 'East Asia';
+  }
+
+  if (lat > 35 && lon < -50) {
+    return 'North America';
+  }
+
+  if (lat > 35 && lon > -10 && lon < 40) {
+    return 'Europe';
+  }
+
+  if (lat < 0 && lon > 110) {
+    return 'Oceania';
+  }
+
+  if (lat < 5 && lon > 90 && lon < 120) {
+    return 'SEA';
+  }
+
+  if (lat < 0 && lon < -30) {
+    return 'South America';
+  }
+
+  return 'DX';
 }
 
 function buildHamClockLandmassPaths(width, height, pad) {
