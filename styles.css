@@ -1346,11 +1346,6 @@ html.reveal-ready .reveal.is-visible {
   letter-spacing: 0.03em;
 }
 
-#hamclock-next-build-text {
-  color: rgba(143, 240, 212, 0.9);
-  font-size: 0.68rem;
-}
-
 #hamclock-copyright-text {
   color: rgba(151, 170, 195, 0.9);
   font-size: 0.69rem;
