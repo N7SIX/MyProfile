@@ -421,11 +421,12 @@ h3 {
 
 .hamclock-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 12px;
 }
 
 .hamclock-card {
+  grid-column: span 3;
   border: 1px solid rgba(148, 178, 213, 0.2);
   border-radius: 14px;
   background: rgba(7, 20, 36, 0.56);
@@ -434,7 +435,21 @@ h3 {
 }
 
 .hamclock-card-wide {
-  grid-column: span 2;
+  grid-column: span 4;
+}
+
+.hamclock-card-compact {
+  min-height: 112px;
+}
+
+.hamclock-ops-card {
+  min-height: 184px;
+}
+
+.hamclock-map-card {
+  order: -1;
+  grid-column: 1 / -1;
+  padding: 16px;
 }
 
 .hamclock-label {
@@ -495,7 +510,8 @@ h3 {
 }
 
 #hc-world-map {
-  min-height: 220px;
+  min-height: 420px;
+  aspect-ratio: 16 / 7;
 }
 
 .hamclock-map-tools {
@@ -520,8 +536,9 @@ h3 {
 .hamclock-map-layout {
   margin-top: 10px;
   display: grid;
-  grid-template-columns: 1.32fr 0.68fr;
-  gap: 10px;
+  grid-template-columns: minmax(0, 1.82fr) minmax(260px, 0.62fr);
+  gap: 12px;
+  align-items: stretch;
 }
 
 .hamclock-cluster {
@@ -529,7 +546,7 @@ h3 {
   border-radius: 10px;
   background: rgba(8, 22, 39, 0.76);
   padding: 10px;
-  min-height: 220px;
+  min-height: 420px;
 }
 
 .hamclock-cluster-head {
@@ -554,7 +571,7 @@ h3 {
   list-style: none;
   display: grid;
   gap: 6px;
-  max-height: 208px;
+  max-height: 378px;
   overflow: auto;
 }
 
@@ -1356,7 +1373,20 @@ html[data-js-state="error"] .runtime-status {
   }
 
   .hamclock-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .hamclock-card {
+    grid-column: span 3;
+  }
+
+  .hamclock-card-wide {
+    grid-column: span 6;
+  }
+
+  #hc-world-map,
+  .hamclock-cluster {
+    min-height: 320px;
   }
 
   .hamclock-map-layout {
@@ -1422,8 +1452,18 @@ html[data-js-state="error"] .runtime-status {
     grid-template-columns: 1fr;
   }
 
+  .hamclock-card,
   .hamclock-card-wide {
     grid-column: auto;
+  }
+
+  .hamclock-card-wide {
+    grid-column: auto;
+  }
+
+  #hc-world-map,
+  .hamclock-cluster {
+    min-height: 250px;
   }
 
   .hamclock-sun-grid {

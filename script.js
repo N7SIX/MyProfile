@@ -765,8 +765,19 @@ function renderHamClockWorldMap() {
     return;
   }
 
-  const width = 680;
-  const height = 280;
+  let width = 960;
+  let height = 420;
+  const viewBoxValue = hamClockNodes.worldMap.getAttribute('viewBox');
+
+  if (viewBoxValue) {
+    const viewBoxParts = viewBoxValue.split(/\s+/).map((part) => Number(part));
+
+    if (viewBoxParts.length === 4 && Number.isFinite(viewBoxParts[2]) && Number.isFinite(viewBoxParts[3])) {
+      width = viewBoxParts[2];
+      height = viewBoxParts[3];
+    }
+  }
+
   const pad = 14;
   const targetKey = hamClockNodes.targetSelect ? hamClockNodes.targetSelect.value : 'tokyo';
   const target = DX_TARGETS[targetKey] || DX_TARGETS.tokyo;
