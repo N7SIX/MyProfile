@@ -53,8 +53,8 @@
       });
 
       (function () {
-        const versionSeed = Number(new Date(document.lastModified)) || Date.now();
-        window.__assetVersion = encodeURIComponent(String(versionSeed));
+        // Use a fresh token per page load to prevent stale JS/CSS after partial deploys.
+        window.__assetVersion = encodeURIComponent(String(Date.now()));
       })();
     </script>
     <title>Sean | N7SIX</title>
