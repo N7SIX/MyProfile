@@ -29,6 +29,22 @@ const hamClockNodes = {
   mapMode: document.getElementById('hc-map-mode'),
   clusterList: document.getElementById('hc-cluster-list'),
   clusterCount: document.getElementById('hc-cluster-count'),
+  sfi: document.getElementById('hc-sfi'),
+  kindex: document.getElementById('hc-kindex'),
+  ssn: document.getElementById('hc-ssn'),
+  aurora: document.getElementById('hc-aurora'),
+  psk: document.getElementById('hc-psk'),
+  rbn: document.getElementById('hc-rbn'),
+  wsjtx: document.getElementById('hc-wsjtx'),
+  clusterRate: document.getElementById('hc-cluster-rate'),
+  pota: document.getElementById('hc-pota'),
+  sota: document.getElementById('hc-sota'),
+  wwff: document.getElementById('hc-wwff'),
+  iota: document.getElementById('hc-iota'),
+  satName: document.getElementById('hc-sat-name'),
+  satAos: document.getElementById('hc-sat-aos'),
+  satLos: document.getElementById('hc-sat-los'),
+  satElev: document.getElementById('hc-sat-elev'),
 };
 
 const HAMCLOCK_WORLD_LANDMASSES = [
@@ -360,6 +376,7 @@ function initializeHamClockPanel() {
     }
 
     updateBandMeter(utcHour);
+    updateHamClockTelemetry(now);
   };
 
   updateClockData();
@@ -893,6 +910,67 @@ function regionNameFromCoords(lat, lon) {
   }
 
   return 'DX';
+}
+
+function updateHamClockTelemetry(now) {
+  const minutes = now.getUTCMinutes();
+  const hour = now.getUTCHours();
+  const wave = Math.sin(((hour * 60) + minutes) / 18);
+  const waveSlow = Math.sin(((hour * 60) + minutes) / 43);
+
+  const sfi = Math.round(125 + (wave * 18) + (waveSlow * 7));
+  const kIndex = Math.max(0, Math.min(9, (2.6 + (waveSlow * 1.8))));
+  const ssn = Math.round(98 + (wave * 26));
+  const aurora = Math.max(0, Math.round(22 + (waveSlow * 18)));
+
+  setNodeText(hamClockNodes.sfi, String(sfi));
+  setNodeText(hamClockNodes.kindex, kIndex.toFixed(1));
+  setNodeText(hamClockNodes.ssn, String(ssn));
+  setNodeText(hamClockNodes.aurora, `${aurora}%`);
+
+  const pskDecodes = Math.max(180, Math.round(530 + (wave * 180)));
+  const rbnSkimmers = Math.max(24, Math.round(61 + (waveSlow * 11)));
+  const wsjtxStreams = Math.max(12, Math.round(33 + (wave * 8)));
+  const clusterRate = Math.max(6, Math.round(17 + (waveSlow * 7)));
+
+  setNodeText(hamClockNodes.psk, `${pskDecodes}/min`);
+  setNodeText(hamClockNodes.rbn, `${rbnSkimmers} skimmers`);
+  setNodeText(hamClockNodes.wsjtx, `${wsjtxStreams} streams`);
+  setNodeText(hamClockNodes.clusterRate, `${clusterRate} spots/min`);
+
+  const pota = Math.max(12, Math.round(44 + (wave * 14)));
+  const sota = Math.max(8, Math.round(23 + (waveSlow * 9)));
+  const wwff = Math.max(3, Math.round(11 + (wave * 5)));
+  const iota = Math.max(1, Math.round(4 + (waveSlow * 2)));
+
+  setNodeText(hamClockNodes.pota, `${pota} active`);
+  setNodeText(hamClockNodes.sota, `${sota} active`);
+  setNodeText(hamClockNodes.wwff, `${wwff} active`);
+  setNodeText(hamClockNodes.iota, `${iota} alerts`);
+
+  const satIndex = minutes % 3;
+  const satellites = [
+    { name: 'RS-44', aos: 11, los: 23, maxElev: 48 },
+    { name: 'AO-91', aos: 27, los: 39, maxElev: 62 },
+    { name: 'ISS', aos: 45, los: 57, maxElev: 31 },
+  ];
+  const sat = satellites[satIndex];
+
+  setNodeText(hamClockNodes.satName, sat.name);
+  setNodeText(hamClockNodes.satAos, formatLocalOffset(now, sat.aos));
+  setNodeText(hamClockNodes.satLos, formatLocalOffset(now, sat.los));
+  setNodeText(hamClockNodes.satElev, `${sat.maxElev}°`);
+}
+
+function setNodeText(node, value) {
+  if (node) {
+    node.textContent = value;
+  }
+}
+
+function formatLocalOffset(baseDate, addMinutes) {
+  const next = new Date(baseDate.getTime() + (addMinutes * 60000));
+  return formatTime(next, STATION_PROFILE.localTimeZone);
 }
 
 function buildHamClockLandmassPaths(width, height, pad) {

@@ -614,6 +614,40 @@ h3 {
 .hamclock-chip-15m { background: #ffd36e; }
 .hamclock-chip-40m { background: #ff9c64; }
 
+.hamclock-telemetry-card {
+  min-height: 156px;
+}
+
+.hamclock-telemetry-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.hamclock-telemetry-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 6px;
+  border: 1px solid rgba(148, 178, 213, 0.14);
+  border-radius: 8px;
+  background: rgba(10, 29, 50, 0.55);
+}
+
+.hamclock-telemetry-list span {
+  color: var(--muted);
+  font-size: 0.76rem;
+}
+
+.hamclock-telemetry-list strong {
+  color: var(--text);
+  font-family: "Hyundai Sans Head", sans-serif;
+  font-size: 0.82rem;
+}
+
 .hamclock-band-meter {
   margin-top: 10px;
   display: grid;
