@@ -23,7 +23,17 @@ const hamClockNodes = {
   dxDistance: document.getElementById('hc-dx-distance'),
   compass: document.getElementById('hc-compass'),
   daylightArc: document.getElementById('hc-daylight-arc'),
+  worldMap: document.getElementById('hc-world-map'),
+  mapCaption: document.getElementById('hc-map-caption'),
 };
+
+const HAMCLOCK_WORLD_LANDMASSES = [
+  [[-168, 72], [-145, 72], [-128, 66], [-110, 58], [-96, 50], [-82, 44], [-78, 34], [-88, 24], [-102, 18], [-112, 25], [-120, 32], [-132, 42], [-145, 52], [-160, 60]],
+  [[-81, 12], [-72, 8], [-66, -4], [-64, -18], [-60, -30], [-54, -42], [-48, -53], [-39, -48], [-35, -34], [-36, -20], [-45, -8], [-58, 2], [-70, 9]],
+  [[-10, 36], [0, 44], [16, 52], [30, 58], [46, 64], [66, 66], [86, 61], [104, 56], [120, 48], [132, 42], [142, 51], [156, 62], [172, 58], [166, 44], [152, 34], [132, 24], [110, 20], [92, 14], [74, 12], [56, 18], [44, 26], [32, 36], [20, 42], [8, 44], [-2, 40]],
+  [[-16, 35], [-4, 37], [12, 35], [24, 28], [33, 16], [40, 4], [42, -12], [36, -28], [24, -34], [12, -35], [2, -24], [-6, -6], [-12, 10]],
+  [[112, -12], [122, -18], [134, -20], [146, -24], [152, -34], [146, -42], [132, -43], [120, -38], [112, -28]],
+];
 
 const STATION_PROFILE = {
   callsign: 'N7SIX',
@@ -339,10 +349,16 @@ function initializeHamClockPanel() {
   window.setInterval(updateClockData, 1000);
 
   updateDxHeading();
+  renderHamClockWorldMap();
 
   if (hamClockNodes.targetSelect) {
-    hamClockNodes.targetSelect.addEventListener('change', updateDxHeading);
+    hamClockNodes.targetSelect.addEventListener('change', () => {
+      updateDxHeading();
+      renderHamClockWorldMap();
+    });
   }
+
+  window.setInterval(renderHamClockWorldMap, 60000);
 
   loadSunTimes();
 }
@@ -699,6 +715,171 @@ function escapeSvgText(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#39;');
+}
+
+function renderHamClockWorldMap() {
+  if (!hamClockNodes.worldMap) {
+    return;
+  }
+
+  const width = 680;
+  const height = 280;
+  const pad = 14;
+  const targetKey = hamClockNodes.targetSelect ? hamClockNodes.targetSelect.value : 'tokyo';
+  const target = DX_TARGETS[targetKey] || DX_TARGETS.tokyo;
+  const now = new Date();
+  const subsolar = getSolarSubpoint(now);
+  const sunPoint = projectMapPoint(subsolar.lon, subsolar.lat, width, height, pad);
+  const stationPoint = projectMapPoint(STATION_PROFILE.lon, STATION_PROFILE.lat, width, height, pad);
+  const targetPoint = projectMapPoint(target.lon, target.lat, width, height, pad);
+  const terminatorPath = buildMapTerminatorPath(subsolar.lon, subsolar.lat, width, height, pad);
+  const routePath = buildGreatCirclePath(stationPoint, targetPoint);
+  const utcLabel = now.toISOString().slice(11, 16);
+
+  hamClockNodes.worldMap.innerHTML = `
+    <defs>
+      <linearGradient id="hcMapOcean" x1="0" x2="1" y1="0" y2="1">
+        <stop offset="0%" stop-color="rgba(11,35,62,0.98)"></stop>
+        <stop offset="100%" stop-color="rgba(6,18,34,0.98)"></stop>
+      </linearGradient>
+      <radialGradient id="hcMapTerminator" gradientUnits="userSpaceOnUse" cx="${sunPoint.x.toFixed(2)}" cy="${sunPoint.y.toFixed(2)}" r="${(Math.max(width, height) * 0.52).toFixed(2)}">
+        <stop offset="0%" stop-color="rgba(0,0,0,0.02)"></stop>
+        <stop offset="45%" stop-color="rgba(0,0,0,0.10)"></stop>
+        <stop offset="76%" stop-color="rgba(0,0,0,0.56)"></stop>
+        <stop offset="100%" stop-color="rgba(0,0,0,0.78)"></stop>
+      </radialGradient>
+      <linearGradient id="hcMapRoute" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0%" stop-color="rgba(246,168,95,0.9)"></stop>
+        <stop offset="100%" stop-color="rgba(143,240,212,0.92)"></stop>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="0" width="${width}" height="${height}" rx="12" fill="url(#hcMapOcean)"></rect>
+    <rect x="0" y="0" width="${width}" height="${height}" rx="12" fill="url(#hcMapTerminator)"></rect>
+    ${buildHamClockLandmassPaths(width, height, pad)}
+    ${buildHamClockGrid(width, height, pad)}
+    <path d="${terminatorPath}" fill="none" stroke="rgba(143,240,212,0.5)" stroke-width="1.2" stroke-dasharray="4 6"></path>
+    <path d="${routePath}" fill="none" stroke="url(#hcMapRoute)" stroke-width="1.6" stroke-dasharray="5 7"></path>
+    <circle cx="${stationPoint.x.toFixed(2)}" cy="${stationPoint.y.toFixed(2)}" r="4.8" fill="rgba(246,168,95,0.95)"></circle>
+    <text x="${(stationPoint.x + 8).toFixed(2)}" y="${(stationPoint.y - 8).toFixed(2)}" fill="rgba(246,199,153,0.95)" font-size="9">N7SIX</text>
+    <circle cx="${targetPoint.x.toFixed(2)}" cy="${targetPoint.y.toFixed(2)}" r="4.4" fill="rgba(143,240,212,0.95)"></circle>
+    <text x="${(targetPoint.x + 8).toFixed(2)}" y="${(targetPoint.y - 8).toFixed(2)}" fill="rgba(236,244,255,0.94)" font-size="9">${escapeSvgText(target.label)}</text>
+    <circle cx="${sunPoint.x.toFixed(2)}" cy="${sunPoint.y.toFixed(2)}" r="4" fill="rgba(255,227,147,0.96)"></circle>
+    <text x="${(sunPoint.x + 8).toFixed(2)}" y="${(sunPoint.y - 9).toFixed(2)}" fill="rgba(255,227,147,0.95)" font-size="9">Sun ${utcLabel}Z</text>
+  `;
+
+  if (hamClockNodes.mapCaption) {
+    hamClockNodes.mapCaption.textContent = `Day/Night: ${utcLabel}Z`;
+  }
+}
+
+function buildHamClockLandmassPaths(width, height, pad) {
+  return HAMCLOCK_WORLD_LANDMASSES
+    .map((polygon) => {
+      const d = polygon
+        .map(([lon, lat], index) => {
+          const point = projectMapPoint(lon, lat, width, height, pad);
+          return `${index === 0 ? 'M' : 'L'}${point.x.toFixed(2)},${point.y.toFixed(2)}`;
+        })
+        .join(' ');
+
+      return `<path d="${d} Z" fill="rgba(59,99,128,0.48)" stroke="rgba(143,240,212,0.22)" stroke-width="1"></path>`;
+    })
+    .join('');
+}
+
+function buildHamClockGrid(width, height, pad) {
+  const lines = [];
+
+  for (let lon = -150; lon <= 150; lon += 30) {
+    const start = projectMapPoint(lon, -75, width, height, pad);
+    const end = projectMapPoint(lon, 75, width, height, pad);
+    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.08)" stroke-width="1"></line>`);
+  }
+
+  for (let lat = -60; lat <= 60; lat += 30) {
+    const start = projectMapPoint(-180, lat, width, height, pad);
+    const end = projectMapPoint(180, lat, width, height, pad);
+    lines.push(`<line x1="${start.x.toFixed(2)}" y1="${start.y.toFixed(2)}" x2="${end.x.toFixed(2)}" y2="${end.y.toFixed(2)}" stroke="rgba(151,170,195,0.08)" stroke-width="1"></line>`);
+  }
+
+  return lines.join('');
+}
+
+function buildMapTerminatorPath(subsolarLon, subsolarLat, width, height, pad) {
+  const points = [];
+  const declination = toRadians(subsolarLat);
+  const safeDeclination = Math.abs(Math.tan(declination)) < 1e-5
+    ? (declination >= 0 ? 1e-5 : -1e-5)
+    : declination;
+
+  for (let lon = -180; lon <= 180; lon += 4) {
+    const hourAngle = toRadians(lon - subsolarLon);
+    const lat = Math.atan(-Math.cos(hourAngle) / Math.tan(safeDeclination));
+    const projected = projectMapPoint(lon, toDegrees(lat), width, height, pad);
+    points.push(`${points.length === 0 ? 'M' : 'L'}${projected.x.toFixed(2)},${projected.y.toFixed(2)}`);
+  }
+
+  return points.join(' ');
+}
+
+function buildGreatCirclePath(origin, destination) {
+  const midX = (origin.x + destination.x) / 2;
+  const midY = (origin.y + destination.y) / 2;
+  const lift = -Math.min(64, Math.hypot(origin.x - destination.x, origin.y - destination.y) * 0.18);
+  return `M ${origin.x.toFixed(2)} ${origin.y.toFixed(2)} Q ${midX.toFixed(2)} ${(midY + lift).toFixed(2)} ${destination.x.toFixed(2)} ${destination.y.toFixed(2)}`;
+}
+
+function projectMapPoint(lon, lat, width, height, pad) {
+  return {
+    x: ((lon + 180) / 360) * (width - (pad * 2)) + pad,
+    y: ((90 - lat) / 180) * (height - (pad * 2)) + pad,
+  };
+}
+
+function getSolarSubpoint(date) {
+  const startOfYear = Date.UTC(date.getUTCFullYear(), 0, 0);
+  const dayOfYear = Math.floor((date.getTime() - startOfYear) / 86400000);
+  const utcHours = date.getUTCHours() + (date.getUTCMinutes() / 60) + (date.getUTCSeconds() / 3600);
+  const gamma = (2 * Math.PI / 365) * ((dayOfYear - 1) + ((utcHours - 12) / 24));
+
+  const declinationRad =
+    0.006918
+    - (0.399912 * Math.cos(gamma))
+    + (0.070257 * Math.sin(gamma))
+    - (0.006758 * Math.cos(2 * gamma))
+    + (0.000907 * Math.sin(2 * gamma))
+    - (0.002697 * Math.cos(3 * gamma))
+    + (0.00148 * Math.sin(3 * gamma));
+
+  const equationOfTime = 229.18 * (
+    0.000075
+    + (0.001868 * Math.cos(gamma))
+    - (0.032077 * Math.sin(gamma))
+    - (0.014615 * Math.cos(2 * gamma))
+    - (0.040849 * Math.sin(2 * gamma))
+  );
+
+  const minutesUtc = utcHours * 60;
+  const hourAngle = ((minutesUtc + equationOfTime) / 4) - 180;
+
+  return {
+    lat: toDegrees(declinationRad),
+    lon: normalizeLongitude(-hourAngle),
+  };
+}
+
+function normalizeLongitude(value) {
+  let lon = value;
+
+  while (lon > 180) {
+    lon -= 360;
+  }
+
+  while (lon < -180) {
+    lon += 360;
+  }
+
+  return lon;
 }
 
 function calculateBearing(lat1, lon1, lat2, lon2) {

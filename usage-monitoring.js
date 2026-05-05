@@ -524,29 +524,94 @@ const buildMapLabels = (width, height) => `
 
 const buildDayNightOverlay = (width, height, pad) => {
   const now = new Date();
-  const subsolarLongitude = getSolarSubpointLongitude(now);
-  const center = projectWorldPoint(subsolarLongitude, 0, width, height, pad);
-  const transition = Math.max(90, (width - (pad * 2)) * 0.19);
-  const left = Math.max(0, center.x - transition);
-  const right = Math.min(width, center.x + transition);
+  const subsolar = getSolarSubpoint(now);
+  const center = projectWorldPoint(subsolar.lon, subsolar.lat, width, height, pad);
+  const twilightRadius = Math.max(width, height) * 0.48;
+  const terminatorPath = buildTerminatorPath(subsolar.lon, subsolar.lat, width, height, pad);
+  const utcLabel = now.toISOString().slice(11, 16);
 
   return `
     <defs>
-      <linearGradient id="mapTerminator" x1="0" x2="1" y1="0" y2="0">
-        <stop offset="0%" stop-color="rgba(0,0,0,0.52)"></stop>
-        <stop offset="${((left / width) * 100).toFixed(2)}%" stop-color="rgba(0,0,0,0.52)"></stop>
-        <stop offset="${((center.x / width) * 100).toFixed(2)}%" stop-color="rgba(0,0,0,0.07)"></stop>
-        <stop offset="${((right / width) * 100).toFixed(2)}%" stop-color="rgba(0,0,0,0.52)"></stop>
-        <stop offset="100%" stop-color="rgba(0,0,0,0.52)"></stop>
-      </linearGradient>
+      <radialGradient id="mapDaylight" gradientUnits="userSpaceOnUse" cx="${center.x.toFixed(2)}" cy="${center.y.toFixed(2)}" r="${twilightRadius.toFixed(2)}">
+        <stop offset="0%" stop-color="rgba(0,0,0,0.00)"></stop>
+        <stop offset="44%" stop-color="rgba(0,0,0,0.08)"></stop>
+        <stop offset="76%" stop-color="rgba(0,0,0,0.52)"></stop>
+        <stop offset="100%" stop-color="rgba(0,0,0,0.74)"></stop>
+      </radialGradient>
     </defs>
-    <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapTerminator)"></rect>
+    <rect x="0" y="0" width="${width}" height="${height}" rx="14" fill="url(#mapDaylight)"></rect>
+    <path d="${terminatorPath}" fill="none" stroke="rgba(143,240,212,0.44)" stroke-width="1.2" stroke-dasharray="4 7"></path>
+    <circle cx="${center.x.toFixed(2)}" cy="${center.y.toFixed(2)}" r="4" fill="rgba(255,227,147,0.95)"></circle>
+    <text x="${(center.x + 8).toFixed(2)}" y="${(center.y - 10).toFixed(2)}" fill="rgba(255,227,147,0.95)" font-size="10">Sun ${utcLabel}Z</text>
   `;
 };
 
-const getSolarSubpointLongitude = (date) => {
+const getSolarSubpoint = (date) => {
+  const startOfYear = Date.UTC(date.getUTCFullYear(), 0, 0);
+  const dayOfYear = Math.floor((date.getTime() - startOfYear) / 86400000);
   const utcHours = date.getUTCHours() + (date.getUTCMinutes() / 60) + (date.getUTCSeconds() / 3600);
-  return 15 * (12 - utcHours);
+  const gamma = (2 * Math.PI / 365) * ((dayOfYear - 1) + ((utcHours - 12) / 24));
+
+  const declinationRad =
+    0.006918
+    - (0.399912 * Math.cos(gamma))
+    + (0.070257 * Math.sin(gamma))
+    - (0.006758 * Math.cos(2 * gamma))
+    + (0.000907 * Math.sin(2 * gamma))
+    - (0.002697 * Math.cos(3 * gamma))
+    + (0.00148 * Math.sin(3 * gamma));
+
+  const equationOfTime = 229.18 * (
+    0.000075
+    + (0.001868 * Math.cos(gamma))
+    - (0.032077 * Math.sin(gamma))
+    - (0.014615 * Math.cos(2 * gamma))
+    - (0.040849 * Math.sin(2 * gamma))
+  );
+
+  const minutesUtc = (utcHours * 60);
+  const hourAngle = ((minutesUtc + equationOfTime) / 4) - 180;
+  const lon = normalizeLongitude(-hourAngle);
+
+  return {
+    lat: toDegrees(declinationRad),
+    lon,
+  };
+};
+
+const buildTerminatorPath = (subsolarLon, subsolarLat, width, height, pad) => {
+  const points = [];
+  const declination = toRadians(subsolarLat);
+  const safeDeclination = Math.abs(Math.tan(declination)) < 1e-5
+    ? (declination >= 0 ? 1e-5 : -1e-5)
+    : declination;
+
+  for (let lon = -180; lon <= 180; lon += 4) {
+    const hourAngle = toRadians(lon - subsolarLon);
+    const lat = Math.atan(-Math.cos(hourAngle) / Math.tan(safeDeclination));
+    const projected = projectWorldPoint(lon, toDegrees(lat), width, height, pad);
+    points.push(`${points.length === 0 ? 'M' : 'L'}${projected.x.toFixed(2)},${projected.y.toFixed(2)}`);
+  }
+
+  return points.join(' ');
+};
+
+const toRadians = (value) => value * (Math.PI / 180);
+
+const toDegrees = (value) => value * (180 / Math.PI);
+
+const normalizeLongitude = (value) => {
+  let lon = value;
+
+  while (lon > 180) {
+    lon -= 360;
+  }
+
+  while (lon < -180) {
+    lon += 360;
+  }
+
+  return lon;
 };
 
 const projectWorldPoint = (lon, lat, width, height, pad) => {
