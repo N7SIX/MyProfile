@@ -11,18 +11,24 @@
         monitoringReady: false,
       };
       window.__setRuntimeFlag = function (flagName) {
+        console.log('__setRuntimeFlag called with:', flagName);
         if (!window.__runtimeFlags || !(flagName in window.__runtimeFlags)) {
+          console.log('  Flag not found in __runtimeFlags');
           return;
         }
 
         window.__runtimeFlags[flagName] = true;
+        console.log('  Flag set. All flags:', window.__runtimeFlags);
 
         if (window.__runtimeFlags.siteUiReady && window.__runtimeFlags.monitoringReady) {
           document.documentElement.setAttribute('data-js-state', 'ready');
+          console.log('  Both flags set, state set to ready');
         }
       };
 
       window.setTimeout(function () {
+        console.log('Boot timeout fired. Current state:', document.documentElement.getAttribute('data-js-state'));
+        console.log('Both flags set?', window.__runtimeFlags.siteUiReady && window.__runtimeFlags.monitoringReady);
         if (document.documentElement.getAttribute('data-js-state') === 'booting') {
           document.documentElement.setAttribute('data-js-state', 'ready');
           const runtimeNode = document.getElementById('runtime-status');
@@ -30,6 +36,7 @@
           if (runtimeNode) {
             runtimeNode.textContent = 'Runtime: partial mode (monitoring is still loading).';
           }
+          console.log('Forced state to ready');
         }
       }, 5000);
 
