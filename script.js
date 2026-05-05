@@ -1,5 +1,5 @@
 const revealNodes = document.querySelectorAll('.reveal');
-const interactiveCards = document.querySelectorAll('.interactive-card');
+const interactiveCards = document.querySelectorAll('.interactive-card:not(.usage-shell)');
 const backgroundCanvas = document.getElementById('background-canvas');
 const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 const socialFeed = document.getElementById('social-feed');
