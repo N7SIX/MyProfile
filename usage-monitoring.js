@@ -369,7 +369,6 @@ const renderWorldMap = (countries, message) => {
   const subsolar = getSolarSubpoint(mapTime);
   const nightPolygon = buildNightPolygon(subsolar.lon, subsolar.lat);
 
-  const maxCount = Math.max(...countries.map((item) => Number(item.count || 0)), 1);
   const markerEntries = countries
     .map((item) => {
       const code = String(item.country || '').toUpperCase();
@@ -380,7 +379,6 @@ const renderWorldMap = (countries, message) => {
       }
 
       const count = Number(item.count || 0);
-      const radius = 4 + ((count / maxCount) * 7);
 
       return {
         code,
@@ -388,7 +386,6 @@ const renderWorldMap = (countries, message) => {
         count,
         lat: centroid.lat,
         lon: centroid.lon,
-        radius,
       };
     })
     .filter(Boolean);
@@ -421,11 +418,11 @@ const renderWorldMap = (countries, message) => {
     .addTo(usageLeafletLayerGroup);
 
   L.circleMarker(stationLatLng, {
-    radius: 7,
-    color: 'rgba(8,24,42,0.95)',
-    weight: 1.5,
-    fillColor: 'rgba(246,168,95,0.95)',
-    fillOpacity: 0.95,
+    radius: 2.6,
+    color: 'rgba(255, 70, 70, 0.98)',
+    weight: 0.8,
+    fillColor: 'rgba(255, 70, 70, 0.98)',
+    fillOpacity: 1,
   })
     .bindTooltip('N7SIX QTH', {
       permanent: true,
@@ -446,11 +443,11 @@ const renderWorldMap = (countries, message) => {
     }).addTo(usageLeafletLayerGroup);
 
     L.circleMarker(markerLatLng, {
-      radius: entry.radius,
-      color: 'rgba(8,28,49,0.92)',
-      weight: 1.2,
-      fillColor: 'rgba(143,240,212,0.9)',
-      fillOpacity: 0.9,
+      radius: 2.2,
+      color: 'rgba(255, 70, 70, 0.98)',
+      weight: 0.8,
+      fillColor: 'rgba(255, 70, 70, 0.98)',
+      fillOpacity: 1,
     })
       .bindTooltip(`${entry.label} (${entry.count.toLocaleString()})`, {
         direction: 'top',
