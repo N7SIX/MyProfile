@@ -816,23 +816,14 @@ const setupActionTracking = () => {
   });
 };
 
-try {
-  console.log('usage-monitoring.js: Initializing tracking');
-  trackPageViewOncePerSession();
-  setupActionTracking();
-  refreshUsagePanels();
-  console.log('usage-monitoring.js: Tracking initialized successfully');
-} catch (error) {
-  console.error('usage-monitoring.js: Error during initialization:', error);
-}
+trackPageViewOncePerSession();
+setupActionTracking();
+refreshUsagePanels();
 
 if (USAGE_TRACKER.countRefreshMs > 0) {
   window.setInterval(refreshUsagePanels, USAGE_TRACKER.countRefreshMs);
 }
 
 if (typeof window.__setRuntimeFlag === 'function') {
-  console.log('usage-monitoring.js: Setting monitoringReady flag');
   window.__setRuntimeFlag('monitoringReady');
-} else {
-  console.error('usage-monitoring.js: __setRuntimeFlag not available');
 }

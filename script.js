@@ -141,13 +141,7 @@ if (socialFeed && socialSummary) {
 const hasHamClockPanel = Object.values(hamClockNodes).some((node) => Boolean(node));
 
 if (hasHamClockPanel) {
-  try {
-    console.log('script.js: Initializing HamClock panel');
-    initializeHamClockPanel();
-    console.log('script.js: HamClock panel initialized successfully');
-  } catch (error) {
-    console.error('script.js: Error initializing HamClock panel:', error);
-  }
+  initializeHamClockPanel();
 }
 
 if (backgroundCanvas && !reduceMotionQuery.matches) {
@@ -335,10 +329,7 @@ interactiveCards.forEach((card) => {
 });
 
 if (typeof window.__setRuntimeFlag === 'function') {
-  console.log('script.js: Setting siteUiReady flag');
   window.__setRuntimeFlag('siteUiReady');
-} else {
-  console.error('script.js: __setRuntimeFlag not available');
 }
 
 function initializeHamClockPanel() {
