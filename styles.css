@@ -425,6 +425,16 @@ h3 {
   gap: 12px;
 }
 
+.hamclock-group-title {
+  grid-column: 1 / -1;
+  margin: 2px 0 -2px;
+  color: rgba(151, 170, 195, 0.86);
+  font-size: 0.74rem;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-family: "Hyundai Sans Head", sans-serif;
+}
+
 .hamclock-card {
   grid-column: span 3;
   border: 1px solid rgba(148, 178, 213, 0.2);
@@ -444,6 +454,11 @@ h3 {
 
 .hamclock-ops-card {
   min-height: 184px;
+}
+
+.hamclock-panel-card {
+  grid-column: span 4;
+  min-height: 220px;
 }
 
 .hamclock-map-card {
@@ -632,6 +647,7 @@ h3 {
 .hamclock-chip-40m { background: #ff9c64; }
 
 .hamclock-telemetry-card {
+  grid-column: span 3;
   min-height: 156px;
 }
 
@@ -1380,8 +1396,16 @@ html[data-js-state="error"] .runtime-status {
     grid-column: span 3;
   }
 
+  .hamclock-panel-card {
+    grid-column: span 6;
+  }
+
   .hamclock-card-wide {
     grid-column: span 6;
+  }
+
+  .hamclock-telemetry-card {
+    grid-column: span 3;
   }
 
   #hc-world-map,
@@ -1454,6 +1478,11 @@ html[data-js-state="error"] .runtime-status {
 
   .hamclock-card,
   .hamclock-card-wide {
+    grid-column: auto;
+  }
+
+  .hamclock-panel-card,
+  .hamclock-telemetry-card {
     grid-column: auto;
   }
 

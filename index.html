@@ -207,6 +207,7 @@
             </div>
 
             <div class="hamclock-grid">
+              <p class="hamclock-group-title">Status</p>
               <article class="hamclock-card hamclock-card-compact">
                 <p class="hamclock-label">UTC Time</p>
                 <p id="hc-utc-time" class="hamclock-value">--:--:--</p>
@@ -231,6 +232,7 @@
                 <p class="hamclock-sub">For night-sky operating context</p>
               </article>
 
+              <p class="hamclock-group-title">Propagation Map</p>
               <article class="hamclock-card hamclock-card-wide hamclock-map-card">
                 <div class="hamclock-dx-head">
                   <p class="hamclock-label">Propagation World View</p>
@@ -258,7 +260,8 @@
                 </div>
               </article>
 
-              <article class="hamclock-card hamclock-card-wide">
+              <p class="hamclock-group-title">Operating Geometry</p>
+              <article class="hamclock-card hamclock-panel-card">
                 <p class="hamclock-label">Solar Window</p>
                 <div class="hamclock-sun-grid">
                   <p id="hc-sunrise" class="hamclock-sub">Sunrise: --</p>
@@ -268,14 +271,14 @@
                 <svg id="hc-daylight-arc" viewBox="0 0 320 120" role="img" aria-label="Sunrise and sunset daylight arc"></svg>
               </article>
 
-              <article class="hamclock-card hamclock-card-wide hamclock-ops-card">
+              <article class="hamclock-card hamclock-panel-card hamclock-ops-card">
                 <p class="hamclock-label">Band Focus</p>
                 <p id="hc-band-now" class="hamclock-sub">Now: --</p>
                 <p id="hc-band-next" class="hamclock-sub">Next: --</p>
                 <div id="hc-band-meter" class="hamclock-band-meter" aria-label="Band activity meter"></div>
               </article>
 
-              <article class="hamclock-card hamclock-card-wide hamclock-ops-card">
+              <article class="hamclock-card hamclock-panel-card hamclock-ops-card">
                 <div class="hamclock-dx-head">
                   <p class="hamclock-label">DX Heading</p>
                   <select id="hc-target-select" class="hamclock-select" aria-label="DX target selector">
@@ -291,6 +294,7 @@
                 <svg id="hc-compass" viewBox="0 0 220 220" role="img" aria-label="DX compass bearing visualization"></svg>
               </article>
 
+              <p class="hamclock-group-title">Network Telemetry</p>
               <article class="hamclock-card hamclock-telemetry-card">
                 <p class="hamclock-label">Solar Indices</p>
                 <ul class="hamclock-telemetry-list">
