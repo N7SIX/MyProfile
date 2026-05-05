@@ -571,36 +571,36 @@ const getSolarSubpoint = (date) => {
 
   const minutesUtc = (utcHours * 60);
   const hourAngle = ((minutesUtc + equationOfTime) / 4) - 180;
-  const lon = normalizeLongitude(-hourAngle);
+  const lon = wmNormalizeLongitude(-hourAngle);
 
   return {
-    lat: toDegrees(declinationRad),
+    lat: wmToDegrees(declinationRad),
     lon,
   };
 };
 
 const buildTerminatorPath = (subsolarLon, subsolarLat, width, height, pad) => {
   const points = [];
-  const declination = toRadians(subsolarLat);
+  const declination = wmToRadians(subsolarLat);
   const safeDeclination = Math.abs(Math.tan(declination)) < 1e-5
     ? (declination >= 0 ? 1e-5 : -1e-5)
     : declination;
 
   for (let lon = -180; lon <= 180; lon += 4) {
-    const hourAngle = toRadians(lon - subsolarLon);
+    const hourAngle = wmToRadians(lon - subsolarLon);
     const lat = Math.atan(-Math.cos(hourAngle) / Math.tan(safeDeclination));
-    const projected = projectWorldPoint(lon, toDegrees(lat), width, height, pad);
+    const projected = projectWorldPoint(lon, wmToDegrees(lat), width, height, pad);
     points.push(`${points.length === 0 ? 'M' : 'L'}${projected.x.toFixed(2)},${projected.y.toFixed(2)}`);
   }
 
   return points.join(' ');
 };
 
-const toRadians = (value) => value * (Math.PI / 180);
+const wmToRadians = (value) => value * (Math.PI / 180);
 
-const toDegrees = (value) => value * (180 / Math.PI);
+const wmToDegrees = (value) => value * (180 / Math.PI);
 
-const normalizeLongitude = (value) => {
+const wmNormalizeLongitude = (value) => {
   let lon = value;
 
   while (lon > 180) {
