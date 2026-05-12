@@ -808,10 +808,42 @@ h3 {
   max-width: 65ch;
 }
 
+
 .social-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.social-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px 10px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background:
+    radial-gradient(circle at top right, rgba(64, 210, 164, 0.12), transparent 35%),
+    linear-gradient(180deg, rgba(10, 24, 45, 0.92), rgba(8, 19, 34, 0.94));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  min-width: 0;
+}
+
+.social-card h3 {
+  font-size: 0.98rem;
+  line-height: 1.2;
+}
+
+.platform-pill {
+  font-size: 0.65rem;
+  padding: 3px 7px;
+}
+
+.social-card p {
+  font-size: 0.85rem;
+}
+
+.social-link {
+  font-size: 0.82rem;
 }
 
 .social-card {
