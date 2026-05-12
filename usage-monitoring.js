@@ -1,3 +1,11 @@
+/**
+ * Usage Monitoring Script
+ * Author: Sean (N7SIX)
+ * Description: Handles event tracking and usage monitoring for the profile site.
+ * License: MIT
+ */
+
+// DOM element references
 const usageCounterNode = document.getElementById('usage-counter');
 const usageTotalNode = document.getElementById('usage-total');
 const usageLastUpdatedNode = document.getElementById('usage-last-updated');

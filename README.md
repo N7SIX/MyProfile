@@ -12,11 +12,6 @@ This repository now includes a starter backend in [monitoring/cloudflare-worker.
 
 ### What it captures
 
-- Event count (total usage)
-- Country (from Cloudflare edge)
-- IP address (from Cloudflare request headers)
-- Action-specific counts (for example button clicks)
-- Public counter value for this site (`/count` endpoint)
 
 ### Setup
 
@@ -37,7 +32,13 @@ This repository now includes a starter backend in [monitoring/cloudflare-worker.
 3. Copy [monitoring/wrangler.toml.example](monitoring/wrangler.toml.example) to `monitoring/wrangler.toml` and set your `database_id`.
 
 4. Add worker secrets:
-
+```bash
+wrangler secret put WRITE_KEY
+wrangler secret put ADMIN_TOKEN
+wrangler secret put ALLOWED_ORIGINS
+```
+Example `ALLOWED_ORIGINS` value:
+`https://n7six.github.io,https://n7six.github.io/MyProfile`
 	```bash
 	wrangler secret put WRITE_KEY
 	wrangler secret put ADMIN_TOKEN
@@ -89,8 +90,6 @@ This repository now includes a starter backend in [monitoring/cloudflare-worker.
 	- `USAGE_TRACKER.trendHours` (public trend window, default 24)
 	- `USAGE_TRACKER.countriesLimit` (how many top countries to display)
 
-	This site already includes a top-bar counter that reads from `/count` and displays `Uses: <number>`.
-	It also includes a dedicated Usage section on the page with animated count-up, last updated timestamp, a 24-hour trend sparkline, and top-country mini chart.
 
 Automatic mode is available using [usage-tracker-config.js](usage-tracker-config.js), which is loaded by [index.html](index.html).
 Edit this file once and the website tracker uses those values automatically.
@@ -128,11 +127,6 @@ Public trend endpoint (no admin token, aggregated counts only):
 curl "https://<your-worker>.workers.dev/trend?site=n7six-myprofile-website&hours=24"
 ```
 
-Public countries endpoint (no admin token, aggregated counts only):
-
-```bash
-curl "https://<your-worker>.workers.dev/countries?site=n7six-myprofile-website&limit=6"
-```
 
 The response includes:
 
@@ -150,28 +144,13 @@ FROM usage_events
 WHERE site = 'uvtools-multi-firmware-web-flasher'
 GROUP BY event
 ORDER BY count DESC;
-```
-
-### Built-in dashboard page
-
-This repo now includes [usage-dashboard.html](usage-dashboard.html) with script/styles in [usage-dashboard.js](usage-dashboard.js) and [usage-dashboard.css](usage-dashboard.css).
-
 Dashboard automatic mode:
-
 - [usage-dashboard.html](usage-dashboard.html) loads [usage-monitor-config.js](usage-monitor-config.js)
 - Set `workerUrl`, `siteId`, and `adminToken` there
 - With `autoLoad: true`, stats load automatically on page open
-- With `autoRefreshMs`, dashboard refreshes automatically
-- With `hideAdminTokenField: true`, token input is hidden if token is already set
-- You can also override values with URL parameters:
 	`usage-dashboard.html?worker=https://...workers.dev&site=uvtools-multi-firmware-web-flasher&token=...`
 - Add `&showTokenField=1` to force-show the token input when needed
 
-Open this page in your browser and enter:
-
-- Worker URL (without `/stats`)
-- Site ID
-- Admin token
 
 It renders:
 
@@ -179,8 +158,16 @@ It renders:
 - Unique IPs
 - Event counters
 - Country counters
-- Recent records (including IP)
+---
 
+## License
+This project is licensed under the [MIT License](LICENSE).
+
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## Contact
+[Sean (N7SIX)](https://github.com/N7SIX)
 ### Important note
 
 IP addresses are personal data in many jurisdictions. Add a privacy notice to your site and comply with local laws (for example GDPR/CCPA where applicable).

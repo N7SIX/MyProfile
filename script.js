@@ -1,3 +1,12 @@
+
+/**
+ * MyProfile - Main Site Script
+ * Author: Sean (N7SIX)
+ * Description: Handles UI interactions, social feed, and animations for the profile site.
+ * License: MIT
+ */
+
+// DOM element references
 const revealNodes = document.querySelectorAll('.reveal');
 const interactiveCards = document.querySelectorAll('.interactive-card:not(.usage-shell)');
 const backgroundCanvas = document.getElementById('background-canvas');

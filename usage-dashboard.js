@@ -1,6 +1,12 @@
 const workerUrlInput = document.getElementById('worker-url');
 const siteIdInput = document.getElementById('site-id');
 const adminTokenInput = document.getElementById('admin-token');
+/**
+ * Usage Dashboard Script
+ * Author: Sean (N7SIX)
+ * Description: Handles dashboard data fetching and rendering for usage monitoring.
+ * License: MIT
+ */
 const adminTokenGroup = document.getElementById('admin-token-group');
 const loadStatsButton = document.getElementById('load-stats');
 const dashboardModeNode = document.getElementById('dashboard-mode');
